@@ -6,6 +6,13 @@ pub fn ZERO_ADDRESS() -> ContractAddress {
     contract_address_const::<0x0>()
 }
 
+// A simple pseudo-random number generator
+pub fn lcg(seed: u64) -> u64 {
+    let a: u64 = 4242;
+    let c: u64 = 4242423;
+    a * seed + c
+}
+
 // Seconds per day
 pub const SECONDS_PER_DAY: u64 = 86400;
 // Achievements quantity
