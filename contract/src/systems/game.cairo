@@ -1,168 +1,116 @@
-// Interface definition
 #[starknet::interface]
 pub trait IGame<T> {
-    // --------- Core gameplay methods ---------
-    fn spawn_player(ref self: T);
-    fn train(ref self: T);
-    fn mine(ref self: T);
-    fn rest(ref self: T);
+    fn enter_chamber(ref self: T, chamber_id: u32);
+    fn move_player(ref self: T, dx: i32, dy: i32);
+    fn emit_pulse(ref self: T, radius: u32);
+    fn complete_chamber(ref self: T);
 }
 
 #[dojo::contract]
 pub mod game {
-    // Local import
     use super::{IGame};
-
-    // Achievement import
-    use full_starter_react::achievements::achievement::{Achievement, AchievementTrait};
-
-    // Store import
-    use full_starter_react::store::{StoreTrait};
-
-    // Constant import
-    use full_starter_react::constants;
-
-    // Models import
-    use full_starter_react::models::player::{PlayerAssert};
-
-    // Dojo achievements imports
-    use achievement::components::achievable::AchievableComponent;
-    use achievement::store::{StoreTrait as AchievementStoreTrait};
-    component!(path: AchievableComponent, storage: achievable, event: AchievableEvent);
-    impl AchievableInternalImpl = AchievableComponent::InternalImpl<ContractState>;
-
-    // Dojo Imports
-    #[allow(unused_imports)]
-    use dojo::model::{ModelStorage};
-    #[allow(unused_imports)]
-    use dojo::world::{WorldStorage, WorldStorageTrait};
-    #[allow(unused_imports)]
+    use starknet::{ContractAddress, get_caller_address};
+    use crate::models::player::Player;
+    use crate::models::chamber::Chamber;
+    use crate::models::game_run::GameRun;
+    use dojo::model::ModelStorage;
     use dojo::event::EventStorage;
+    use core::traits::TryInto;
 
-    use starknet::{get_block_timestamp};
-
-    #[storage]
-    struct Storage {
-        #[substorage(v0)]
-        achievable: AchievableComponent::Storage,
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct PulseEmitted {
+        #[key]
+        pub player: ContractAddress,
+        pub chamber_id: u32,
+        pub x: u32,
+        pub y: u32,
+        pub radius: u32,
     }
 
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        #[flat]
-        AchievableEvent: AchievableComponent::Event,
-    }
-
-    // Constructor
-    fn dojo_init(ref self: ContractState) {
-        let mut world = self.world(@"full_starter_react");
-
-        let mut achievement_id: u8 = 1;
-        while achievement_id <= constants::ACHIEVEMENTS_COUNT {
-            let achievement: Achievement = achievement_id.into();
-            self
-                .achievable
-                .create(
-                    world,
-                    id: achievement.identifier(),
-                    hidden: achievement.hidden(),
-                    index: achievement.index(),
-                    points: achievement.points(),
-                    start: achievement.start(),
-                    end: achievement.end(),
-                    group: achievement.group(),
-                    icon: achievement.icon(),
-                    title: achievement.title(),
-                    description: achievement.description(),
-                    tasks: achievement.tasks(),
-                    data: achievement.data(),
-                );
-            achievement_id += 1;
-        }
-    }
-
-    // Implementation of the interface methods
     #[abi(embed_v0)]
     impl GameImpl of IGame<ContractState> {
-        
-        // Method to create a new player
-        fn spawn_player(ref self: ContractState) {
-            let mut world = self.world(@"full_starter_react");
-            let store = StoreTrait::new(world);
-
-            // Create new player
-            store.create_player();
+        fn enter_chamber(ref self: ContractState, chamber_id: u32) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let chamber: Chamber = world.read_model(chamber_id);
+            let mut player_state: Player = world.read_model(player);
+            player_state.chamber_id = chamber_id;
+            player_state.x = chamber.start_x;
+            player_state.y = chamber.start_y;
+            player_state.pulses_used = 0;
+            player_state.deaths = 0;
+            world.write_model(@player_state);
         }
 
-        // Method to train player (+10 experience)
-        fn train(ref self: ContractState) {
-            let mut world = self.world(@"full_starter_react");
-            let store = StoreTrait::new(world);
-            let achievement_store = AchievementStoreTrait::new(world);
+        fn move_player(ref self: ContractState, dx: i32, dy: i32) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let mut player_state: Player = world.read_model(player);
+            let chamber: Chamber = world.read_model(player_state.chamber_id);
 
-            let player = store.read_player();
+            // Convert player_state.x/y and chamber.width/height to i32 for math
+            let x_i32: i32 = player_state.x.try_into().unwrap();
+            let y_i32: i32 = player_state.y.try_into().unwrap();
+            let width_i32: i32 = chamber.width.try_into().unwrap();
+            let height_i32: i32 = chamber.height.try_into().unwrap();
 
-            // Train player
-            store.train_player();
+            let new_x_i32 = x_i32 + dx;
+            let new_y_i32 = y_i32 + dy;
 
-            // Emit events for achievements progression
-            let mut achievement_id = constants::ACHIEVEMENTS_INITIAL_ID; // 1
-            let stop = constants::ACHIEVEMENTS_COUNT; // 5
-            
-            while achievement_id <= stop {
-                let task: Achievement = achievement_id.into(); // u8 to Achievement
-                let task_identifier = task.identifier(); // Achievement identifier is the task to complete
-                achievement_store.progress(player.owner.into(), task_identifier, 1, get_block_timestamp());
-                achievement_id += 1;
-            };
+            // Bounds check: new_x and new_y must be >= 0 and < width/height
+            assert(new_x_i32 >= 0, 'Out of bounds');
+            assert(new_x_i32 < width_i32, 'Out of bounds');
+            assert(new_y_i32 >= 0, 'Out of bounds');
+            assert(new_y_i32 < height_i32, 'Out of bounds');
+
+            // Convert back to u32 for indexing
+            let new_x: u32 = new_x_i32.try_into().unwrap();
+            let new_y: u32 = new_y_i32.try_into().unwrap();
+
+            // Calculate index in flattened map array
+            let idx: u32 = new_y * chamber.width + new_x;
+            let idx_usize: usize = idx.try_into().unwrap();
+            let cell = *chamber.map.at(idx_usize);
+            assert(cell != 0, 'Cannot move into wall');
+            if cell == 3 {
+                // Fell into void: reset to start, increment deaths
+                player_state.x = chamber.start_x;
+                player_state.y = chamber.start_y;
+                player_state.deaths += 1;
+            } else {
+                player_state.x = new_x;
+                player_state.y = new_y;
+            }
+            world.write_model(@player_state);
         }
 
-        // Method to mine coins (+5 coins, -5 health)
-        fn mine(ref self: ContractState) {
-            let mut world = self.world(@"full_starter_react");
-            let store = StoreTrait::new(world);
-            let achievement_store = AchievementStoreTrait::new(world);
-
-            let player = store.read_player();
-           
-            // Mine coins
-            store.mine_coins();
-
-            // Emit events for achievements progression
-            let mut achievement_id = constants::ACHIEVEMENTS_INITIAL_ID; // 1
-            let stop = constants::ACHIEVEMENTS_COUNT; // 5
-            
-            while achievement_id <= stop {
-                let task: Achievement = achievement_id.into(); // u8 to Achievement
-                let task_identifier = task.identifier(); // Achievement identifier is the task to complete
-                achievement_store.progress(player.owner.into(), task_identifier, 1, get_block_timestamp());
-                achievement_id += 1;
-            };
+        fn emit_pulse(ref self: ContractState, radius: u32) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let mut player_state: Player = world.read_model(player);
+            player_state.pulses_used += 1;
+            world.write_model(@player_state);
+            world.emit_event(@PulseEmitted {
+                player,
+                chamber_id: player_state.chamber_id,
+                x: player_state.x,
+                y: player_state.y,
+                radius,
+            });
         }
 
-        // Method to rest player (+20 health)
-        fn rest(ref self: ContractState) {
-            let mut world = self.world(@"full_starter_react");
-            let store = StoreTrait::new(world);
-            let achievement_store = AchievementStoreTrait::new(world);
-
-            let player = store.read_player();
-
-            // Rest player
-            store.rest_player();
-
-            // Emit events for achievements progression
-            let mut achievement_id = constants::ACHIEVEMENTS_INITIAL_ID; // 1
-            let stop = constants::ACHIEVEMENTS_COUNT; // 5
-            
-            while achievement_id <= stop {
-                let task: Achievement = achievement_id.into(); // u8 to Achievement
-                let task_identifier = task.identifier(); // Achievement identifier is the task to complete
-                achievement_store.progress(player.owner.into(), task_identifier, 1, get_block_timestamp());
-                achievement_id += 1;
-            };
+        fn complete_chamber(ref self: ContractState) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let mut player_state: Player = world.read_model(player);
+            let chamber: Chamber = world.read_model(player_state.chamber_id);
+            assert(player_state.x == chamber.exit_x, 'Not at exit');
+            assert(player_state.y == chamber.exit_y, 'Not at exit');
+            let mut run: GameRun = world.read_model((player, 0)); // Example: run_id=0
+            run.completed_chambers += 1;
+            run.score += 1;
+            world.write_model(@run);
         }
-
     }
 }
