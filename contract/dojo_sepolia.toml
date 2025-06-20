@@ -1,6 +1,6 @@
 [world]
 name = "Echoes-of-the-Void"
-description = "Echoes of the Void" is a minimalist, turn-based, grid-based puzzle-platformer set in a completely dark environment."
+description = "Echoes of the Void is a minimalist, grid-based puzzle-platformer set in a completely dark environment."
 seed = "seed4242"
 
 [namespace]

@@ -11,10 +11,12 @@ pub mod utils {
     };
 
     // System imports
-    use full_starter_react::systems::game::{game, IGameDispatcher};
+    use echoes_of_the_void::systems::game::{game, IGameDispatcher};
 
     // Models imports
-    use full_starter_react::models::player::{m_Player};
+    use echoes_of_the_void::models::player::{m_Player};
+    use echoes_of_the_void::models::chamber::{m_Chamber};
+    use echoes_of_the_void::models::game_run::{m_GameRun};
 
     // ------- Constants -------
     pub fn PLAYER() -> ContractAddress {
@@ -24,11 +26,14 @@ pub mod utils {
      // ------- Definitions -------
     pub fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {
-            namespace: "full_starter_react",
+            namespace: "echoes_of_the_void",
             resources: [
                 TestResource::Model(m_Player::TEST_CLASS_HASH),
-                TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
-                TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
+                TestResource::Model(m_Chamber::TEST_CLASS_HASH),
+                TestResource::Model(m_GameRun::TEST_CLASS_HASH),
+                TestResource::Event(game::e_PulseEmitted::TEST_CLASS_HASH.try_into().unwrap()),
+                // TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
+                // TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
                 TestResource::Contract(game::TEST_CLASS_HASH),
             ].span(),
         };
@@ -38,8 +43,8 @@ pub mod utils {
 
     pub fn contract_defs() -> Span<ContractDef> {
         [
-            ContractDefTrait::new(@"full_starter_react", @"game")
-                .with_writer_of([dojo::utils::bytearray_hash(@"full_starter_react")].span()),
+            ContractDefTrait::new(@"echoes_of_the_void", @"game")
+                .with_writer_of([dojo::utils::bytearray_hash(@"echoes_of_the_void")].span()),
                 
         ]
             .span()

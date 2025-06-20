@@ -1,195 +1,154 @@
-// Integration tests for Game Starter functionality
+use dojo_cairo_test::WorldStorageTestTrait;
+use echoes_of_the_void::systems::game::IGameDispatcherTrait;
+
 #[cfg(test)]
 mod tests {
-    // Test utilities
-    use full_starter_react::tests::utils::utils::{
-        PLAYER, cheat_caller_address, create_game_system, create_test_world,
-    };
-    
-    // System imports
-    use full_starter_react::systems::game::{IGameDispatcherTrait};
-    
-    // Models imports
-    use full_starter_react::models::player::{Player};
-    
-    // Dojo imports
-    #[allow(unused_imports)]
-    use dojo::world::{WorldStorage, WorldStorageTrait};
-    use dojo::model::{ModelStorage};
-    
-    
-    #[test]
-    #[available_gas(40000000)]
-    fn test_spawn_player() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Test spawning a player
-        game_system.spawn_player();
-        
-        // Verify player was created successfully
-        let player: Player = world.read_model(PLAYER());
-        
-        // Basic player validation
-        assert(player.owner == PLAYER(), 'Player owner should match');
-        assert(player.experience == 0, 'Player starts with 0 exp');
-        assert(player.health == 100, 'Player starts with 100 health');
-        assert(player.coins == 0, 'Player starts with 0 coins');
+    use super::*;
+    use crate::tests::utils::utils;
+    use crate::models::player::Player;
+    use crate::models::chamber::Chamber;
+    use crate::models::game_run::GameRun;
+    use dojo::model::ModelStorage;
+    use starknet::{ContractAddress};
+
+    // 3x3 grid:
+    // [0,2,0]
+    // [2,2,4]
+    // [0,2,3]
+    // Indices: 0 1 2
+    //          3 4 5
+    //          6 7 8
+    fn mock_chamber() -> Chamber {
+        let map = array![0_u8,2,0, 2,2,4, 0,2,3]; // (2,2) is now void (3)
+        Chamber {
+            chamber_id: 1,
+            map,
+            width: 3,
+            height: 3,
+            start_x: 1,
+            start_y: 1,
+            exit_x: 2,
+            exit_y: 1,
+        }
     }
-    
-    #[test]
-    #[available_gas(40000000)]
-    fn test_train_player() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player first
-        game_system.spawn_player();
-        
-        // Train the player
-        game_system.train();
-        
-        // Verify player state after training
-        let player: Player = world.read_model(PLAYER());
-        
-        assert(player.experience == 10, 'Player should have 10 exp');
-        assert(player.health == 100, 'Health should remain 100');
-        assert(player.coins == 0, 'Coins should remain 0');
+
+    fn mock_player(addr: ContractAddress) -> Player {
+        Player {
+            player: addr,
+            chamber_id: 0,
+            x: 1,
+            y: 1,
+            pulses_used: 0,
+            deaths: 0,
+        }
     }
-    
-    #[test]
-    #[available_gas(40000000)]
-    fn test_multiple_training_sessions() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player first
-        game_system.spawn_player();
-        
-        // Train multiple times
-        game_system.train(); // +10 exp = 10
-        game_system.train(); // +10 exp = 20
-        game_system.train(); // +10 exp = 30
-        
-        // Verify cumulative experience
-        let player: Player = world.read_model(PLAYER());
-        assert(player.experience == 30, 'Player should have 30 exp');
+
+    fn mock_game_run(addr: ContractAddress) -> GameRun {
+        GameRun {
+            player: addr,
+            run_id: 0,
+            score: 0,
+            completed_chambers: 0,
+            timestamp: 0,
+        }
     }
-    
+
     #[test]
-    #[available_gas(40000000)]
-    fn test_mine_coins() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player first
-        game_system.spawn_player();
-        
-        // Mine coins
-        game_system.mine();
-        
-        // Verify player state after mining
-        let player: Player = world.read_model(PLAYER());
-        
-        assert(player.coins == 5, 'Player should have 5 coins');
-        assert(player.health == 95, 'Health should be 95');
-        assert(player.experience == 0, 'Experience should remain 0');
+    fn test_move_to_path() {
+        // Move left from (1,1) to (0,1) which is cell 2 (path)
+        let mut world = utils::create_test_world();
+        let player_addr = utils::PLAYER();
+        let chamber = mock_chamber();
+        let mut player = mock_player(player_addr);
+        world.write_model(@chamber);
+        world.write_model(@player);
+        utils::cheat_caller_address(player_addr);
+        let mut game = utils::create_game_system(world);
+        game.enter_chamber(1);
+        game.move_player(-1, 0); // (1,1) -> (0,1)
+        let updated: Player = world.read_model(player_addr);
+        assert(updated.x == 0 && updated.y == 1, 'Moved to path');
+        assert(updated.deaths == 0, 'No deaths on path');
     }
-    
+
     #[test]
-    #[available_gas(40000000)]
-    fn test_multiple_mining_sessions() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player first
-        game_system.spawn_player();
-        
-        // Mine multiple times
-        game_system.mine(); // +5 coins, -5 health = 5 coins, 95 health
-        game_system.mine(); // +5 coins, -5 health = 10 coins, 90 health
-        game_system.mine(); // +5 coins, -5 health = 15 coins, 85 health
-        
-        // Verify cumulative effects
-        let player: Player = world.read_model(PLAYER());
-        assert(player.coins == 15, 'Player should have 15 coins');
-        assert(player.health == 85, 'Player should have 85 health');
+    #[should_panic]
+    fn test_move_to_wall() {
+        // Move up from (1,1) to (1,0) which is cell 2 (path), then left to (0,0) which is cell 0 (wall)
+        let mut world = utils::create_test_world();
+        let player_addr = utils::PLAYER();
+        let chamber = mock_chamber();
+        let mut player = mock_player(player_addr);
+        world.write_model(@chamber);
+        world.write_model(@player);
+        utils::cheat_caller_address(player_addr);
+        let mut game = utils::create_game_system(world);
+        game.enter_chamber(1);
+        game.move_player(0, -1); // (1,1) -> (1,0) (path)
+        game.move_player(-1, 0); // (1,0) -> (0,0) (wall, should panic)
     }
-    
+
     #[test]
-    #[available_gas(40000000)]
-    fn test_rest_player() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player first
-        game_system.spawn_player();
-        
-        // Mine to reduce health first
-        game_system.mine(); // Health becomes 95
-        
-        // Rest to recover health
-        game_system.rest();
-        
-        // Verify player state after resting
-        let player: Player = world.read_model(PLAYER());
-        
-        assert(player.health == 115, 'Health should be 115');
-        assert(player.coins == 5, 'Coins should remain 5');
-        assert(player.experience == 0, 'Experience should remain 0');
+    fn test_move_to_void() {
+        // Move down from (1,1) to (1,2) (path), then right to (2,2) (void)
+        let mut world = utils::create_test_world();
+        let player_addr = utils::PLAYER();
+        let chamber = mock_chamber();
+        let mut player = mock_player(player_addr);
+        world.write_model(@chamber);
+        world.write_model(@player);
+        utils::cheat_caller_address(player_addr);
+        let mut game = utils::create_game_system(world);
+        game.enter_chamber(1);
+        // Move down to (1,2) (path)
+        game.move_player(0, 1);
+        // Move right to (2,2) (void)
+        game.move_player(1, 0);
+        let updated: Player = world.read_model(player_addr);
+        // After falling into void, player should be reset to start
+        assert(updated.x == chamber.start_x && updated.y == chamber.start_y, 'Reset to start after void');
+        assert(updated.deaths == 1, 'Deaths incremented after void');
     }
-    
+
     #[test]
-    #[available_gas(80000000)]
-    fn test_complete_game_flow() {
-        // Create test environment
-        let world = create_test_world();
-        let game_system = create_game_system(world);
-        
-        // Set the caller address for the test
-        cheat_caller_address(PLAYER());
-        
-        // Spawn a player
-        game_system.spawn_player();
-        
-        // Perform various actions
-        game_system.train();  // +10 exp
-        game_system.mine();   // +5 coins, -5 health
-        game_system.rest();   // +20 health
-        game_system.train();  // +10 exp
-        game_system.mine();   // +5 coins, -5 health
-        
-        // Verify final state
-        let player: Player = world.read_model(PLAYER());
-        
-        assert(player.experience == 20, 'Should have 20 experience');
-        assert(player.coins == 10, 'Should have 10 coins');
-        assert(player.health == 110, 'Should have 110 health'); // 100 - 5 + 20 - 5 = 110
+    #[should_panic]
+    fn test_wall_after_void_reset() {
+        // Move down to (1,2) (path), right to (2,2) (void), then up to (1,1) (reset), then left to (0,1) (path), then up to (0,0) (wall, should panic)
+        let mut world = utils::create_test_world();
+        let player_addr = utils::PLAYER();
+        let chamber = mock_chamber();
+        let mut player = mock_player(player_addr);
+        world.write_model(@chamber);
+        world.write_model(@player);
+        utils::cheat_caller_address(player_addr);
+        let mut game = utils::create_game_system(world);
+        game.enter_chamber(1);
+        // Move down to (1,2) (path)
+        game.move_player(0, 1);
+        // Move right to (2,2) (void)
+        game.move_player(1, 0);
+        // Now at start (1,1) after void
+        // Move left to (0,1) (path)
+        game.move_player(-1, 0);
+        // Move up to (0,0) (wall, should panic)
+        game.move_player(0, -1);
     }
-   
-   
+
+    #[test]
+    fn test_move_to_exit() {
+        // Move right from (1,1) to (2,1) which is cell 4 (exit)
+        let mut world = utils::create_test_world();
+        let player_addr = utils::PLAYER();
+        let chamber = mock_chamber();
+        let mut player = mock_player(player_addr);
+        world.write_model(@chamber);
+        world.write_model(@player);
+        utils::cheat_caller_address(player_addr);
+        let mut game = utils::create_game_system(world);
+        game.enter_chamber(1);
+        game.move_player(1, 0); // (1,1) -> (2,1)
+        let updated: Player = world.read_model(player_addr);
+        assert(updated.x == 2 && updated.y == 1, 'Moved to exit');
+        assert(updated.deaths == 0, 'No deaths on exit');
+    }
 }

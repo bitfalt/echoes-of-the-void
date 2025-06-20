@@ -20,8 +20,8 @@ pub mod models {
     pub mod map_cell_type;
 }
 
-// #[cfg(test)]
-// pub mod tests {
-//     pub mod test_game;
-//     pub mod utils;
-// }
+#[cfg(test)]
+pub mod tests {
+    pub mod test_game;
+    pub mod utils;
+}
