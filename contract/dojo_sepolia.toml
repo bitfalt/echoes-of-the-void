@@ -1,15 +1,15 @@
 [world]
-name = "Full-Starter-React"
-description = "Full Starter React is a template project to be used for other devs to quickly learn how to use the controller, achievements, backend and its integration. Built using Dojo Engine and Cartridge Controller on Starknet."
-seed = "seed123"
+name = "Echoes-of-the-Void"
+description = "Echoes of the Void" is a minimalist, turn-based, grid-based puzzle-platformer set in a completely dark environment."
+seed = "seed4242"
 
 [namespace]
-default = "full_starter_react"
+default = "echoes_of_the_void"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
 
 [writers]
-"full_starter_react" = ["full_starter_react-game"]
-"full_starter_react-TrophyCreation" = ["full_starter_react-game"]
-"full_starter_react-TrophyProgression" = ["full_starter_react-game"]
+"echoes_of_the_void" = ["echoes_of_the_void-game"]
+"echoes_of_the_void-TrophyCreation" = ["echoes_of_the_void-game"]
+"echoes_of_the_void-TrophyProgression" = ["echoes_of_the_void-game"]
