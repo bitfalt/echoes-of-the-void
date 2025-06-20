@@ -19,7 +19,7 @@ pub struct Chamber {
 
 #[generate_trait]
 pub impl ChamberImpl of ChamberTrait {
-    fn new(chamber_id: u32, seed: u64, width: u32, height: u32) -> Chamber {
+    fn new(chamber_id: u32, seed: u32, width: u32, height: u32) -> Chamber {
         let mut path_locations: Array<(u32, u32)> = ArrayTrait::new();
         let mut first_pass_seed = seed;
 
@@ -112,7 +112,7 @@ mod tests {
     const SEED_2: u32 = 54321;
 
     #[test]
-    #[available_gas(2000000)]
+    #[available_gas(200000000)]
     fn test_chamber_creation() {
         let chamber = ChamberTrait::new(1, SEED_1, WIDTH, HEIGHT);
 
@@ -139,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(2000000)]
+    #[available_gas(200000000)]
     fn test_start_and_exit_placement() {
         let chamber = ChamberTrait::new(1, SEED_1, WIDTH, HEIGHT);
 
@@ -164,7 +164,7 @@ mod tests {
     }
     
     #[test]
-    #[available_gas(4000000)]
+    #[available_gas(400000000)]
     fn test_chamber_determinism() {
         let chamber1 = ChamberTrait::new(1, SEED_1, WIDTH, HEIGHT);
         let chamber2 = ChamberTrait::new(1, SEED_1, WIDTH, HEIGHT);

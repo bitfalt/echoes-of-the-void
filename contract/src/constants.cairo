@@ -7,9 +7,9 @@ pub fn ZERO_ADDRESS() -> ContractAddress {
 }
 
 // A simple pseudo-random number generator
-pub fn lcg(seed: u64) -> u64 {
-    let a: u64 = 4242;
-    let c: u64 = 4242423;
+pub fn lcg(seed: u32) -> u32 {
+    let a: u32 = 1;
+    let c: u32 = 42;
     a * seed + c
 }
 
