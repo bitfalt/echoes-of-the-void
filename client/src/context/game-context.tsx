@@ -4,106 +4,132 @@ import { createContext, useContext, useReducer, type ReactNode } from "react"
 
 interface GameState {
   connected: boolean
-  level: number
-  experience: number
-  maxExp: number
-  health: number
-  coins: number
+  chamberId: number
+  pulsesUsed: number
+  deaths: number
+  playerPosition: {
+    x: number
+    y: number
+  }
+  revealedCells: Array<{
+    x: number
+    y: number
+    type: number
+  }>
   address: string | null
   isLoading: boolean
   txStatus: {
     message: string
     type: "pending" | "success" | "error" | null
   }
-  achievement: string | null
+  notification: string | null
 }
 
 type GameAction =
   | { type: "CONNECT_WALLET_START" }
   | { type: "CONNECT_WALLET_SUCCESS"; address: string }
-  | { type: "TRAIN_PLAYER" }
-  | { type: "MINE_COINS" }
-  | { type: "REST_PLAYER" }
+  | { type: "MOVE_PLAYER"; x: number; y: number }
+  | { type: "EMIT_PULSE"; cells: Array<{x: number, y: number, type: number}> }
+  | { type: "COMPLETE_CHAMBER"; nextChamberId: number }
+  | { type: "PLAYER_DIED" }
   | { type: "SET_TX_STATUS"; message: string; txType: "pending" | "success" | "error" }
   | { type: "CLEAR_TX_STATUS" }
-  | { type: "SHOW_ACHIEVEMENT"; achievement: string }
-  | { type: "CLEAR_ACHIEVEMENT" }
+  | { type: "SHOW_NOTIFICATION"; message: string }
+  | { type: "CLEAR_NOTIFICATION" }
 
 const initialState: GameState = {
   connected: false,
-  level: 1,
-  experience: 0,
-  maxExp: 100,
-  health: 100,
-  coins: 0,
+  chamberId: 0,
+  pulsesUsed: 0,
+  deaths: 0,
+  playerPosition: {
+    x: 0,
+    y: 0
+  },
+  revealedCells: [],
   address: null,
   isLoading: false,
   txStatus: { message: "", type: null },
-  achievement: null,
+  notification: null,
 }
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case "CONNECT_WALLET_START":
+    case "CONNECT_WALLET_START": {
       return { ...state, isLoading: true }
+    }
 
-    case "CONNECT_WALLET_SUCCESS":
+    case "CONNECT_WALLET_SUCCESS": {
       return {
         ...state,
         connected: true,
         address: action.address,
         isLoading: false,
       }
+    }
 
-    case "TRAIN_PLAYER":
-      const newExp = state.experience + 10
-      const levelUp = newExp >= state.maxExp
+    case "MOVE_PLAYER": {
       return {
         ...state,
-        experience: levelUp ? 0 : newExp,
-        level: levelUp ? state.level + 1 : state.level,
-        maxExp: levelUp ? state.maxExp + 50 : state.maxExp,
-        achievement: levelUp ? `Level ${state.level + 1} Reached!` : state.achievement,
+        playerPosition: {
+          x: action.x,
+          y: action.y
+        }
       }
+    }
 
-    case "MINE_COINS":
-      const newCoins = state.coins + 5
+    case "EMIT_PULSE": {
       return {
         ...state,
-        coins: newCoins,
-        health: Math.max(0, state.health - 5),
-        achievement: newCoins >= 50 && state.coins < 50 ? "Wealthy Miner!" : state.achievement,
+        pulsesUsed: state.pulsesUsed + 1,
+        revealedCells: [...state.revealedCells, ...action.cells]
       }
+    }
 
-    case "REST_PLAYER":
+    case "COMPLETE_CHAMBER": {
       return {
         ...state,
-        health: Math.min(100, state.health + 20),
+        chamberId: action.nextChamberId,
+        revealedCells: [],
+        notification: `Chamber ${state.chamberId} Completed!`
       }
+    }
 
-    case "SET_TX_STATUS":
+    case "PLAYER_DIED": {
+      return {
+        ...state,
+        deaths: state.deaths + 1,
+        notification: "You fell into the void!"
+      }
+    }
+
+    case "SET_TX_STATUS": {
       return {
         ...state,
         txStatus: { message: action.message, type: action.txType },
       }
+    }
 
-    case "CLEAR_TX_STATUS":
+    case "CLEAR_TX_STATUS": {
       return {
         ...state,
         txStatus: { message: "", type: null },
       }
+    }
 
-    case "SHOW_ACHIEVEMENT":
+    case "SHOW_NOTIFICATION": {
       return {
         ...state,
-        achievement: action.achievement,
+        notification: action.message,
       }
+    }
 
-    case "CLEAR_ACHIEVEMENT":
+    case "CLEAR_NOTIFICATION": {
       return {
         ...state,
-        achievement: null,
+        notification: null,
       }
+    }
 
     default:
       return state
