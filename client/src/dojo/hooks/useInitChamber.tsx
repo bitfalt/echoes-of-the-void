@@ -65,7 +65,7 @@ export const useInitChamber = (): UseInitChamberReturn => {
       const height = 16;
 
       // First create the chamber
-      const createTx = await client.game.create_chamber(
+      const createTx = await client.game.createChamber(
         account as Account, 
         targetChamberId,
         seed,

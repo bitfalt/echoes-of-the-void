@@ -56,7 +56,7 @@ export const useCompleteChamber = (): UseCompleteChamberReturn => {
 
       console.log("📤 Executing complete chamber transaction...");
 
-      const tx = await client.game.complete_chamber(account as Account);
+      const tx = await client.game.completeChamber(account as Account);
       console.log("📥 Complete chamber transaction response:", tx);
 
       if (tx?.transaction_hash) {

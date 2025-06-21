@@ -55,7 +55,7 @@ export const useEmitPulseAction = (): UseEmitPulseReturn => {
 
       // Default pulse radius - adjust as needed for your game
       const radius = 5;
-      const tx = await client.game.emit_pulse(account as Account, radius);
+      const tx = await client.game.emitPulse(account as Account, radius);
       console.log("📥 Emit pulse transaction response:", tx);
 
       if (tx?.transaction_hash) {

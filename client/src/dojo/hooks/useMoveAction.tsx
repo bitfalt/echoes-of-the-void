@@ -75,7 +75,7 @@ export const useMoveAction = (): UseMoveActionReturn => {
       }
 
       // Call the move_player function with dx/dy
-      const tx = await client.game.move_player(account as Account, dx, dy);
+      const tx = await client.game.movePlayer(account as Account, dx, dy);
 
       console.log(`📥 ${direction} move transaction response:`, tx);
 
