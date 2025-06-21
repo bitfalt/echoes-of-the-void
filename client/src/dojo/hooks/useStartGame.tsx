@@ -59,7 +59,7 @@ export const useStartGame = (): UseStartGameReturn => {
       // First reset any existing game data in the store
       resetStore();
 
-      const tx = await client.game.create_game_run(account as Account);
+      const tx = await client.game.createGameRun(account as Account);
       console.log("📥 Start game transaction response:", tx);
 
       if (tx?.transaction_hash) {

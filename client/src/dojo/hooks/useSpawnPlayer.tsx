@@ -141,7 +141,7 @@ export const useSpawnPlayer = () => {
 
         // Execute spawn transaction
         console.log("📤 Executing spawn transaction...");
-        const spawnTx = await client.game.spawnPlayer(account as Account);
+        const spawnTx = await client.game.createPlayer(account as Account);
 
         console.log("📥 Spawn transaction response:", spawnTx);
 

@@ -64,18 +64,18 @@ const fetchPlayerData = async (playerOwner: string): Promise<Player | null> => {
     const result = await response.json();
     console.log("📡 GraphQL response:", result);
 
-    if (!result.data?.fullStarterReactPlayerModels?.edges?.length) {
+    if (!result.data?.echoesOfTheVoidPlayerModels?.edges?.length) {
       console.log("❌ No player found in response");
       return null;
     }
 
     // Extract player data
-    const rawPlayerData = result.data.fullStarterReactPlayerModels.edges[0].node;
+    const rawPlayerData = result.data.echoesOfTheVoidPlayerModels.edges[0].node;
     console.log("📄 Raw player data:", rawPlayerData);
 
     // Convert hex values to numbers - using your structure
     const playerData: Player = {
-      player: rawPlayerData.owner,
+      player: rawPlayerData.player,
       chamber_id: hexToNumber(rawPlayerData.chamber_id),
       x: hexToNumber(rawPlayerData.x),
       y: hexToNumber(rawPlayerData.y),
