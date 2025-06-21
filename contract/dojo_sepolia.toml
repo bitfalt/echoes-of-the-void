@@ -11,5 +11,4 @@ rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
 
 [writers]
 "echoes_of_the_void" = ["echoes_of_the_void-game"]
-"echoes_of_the_void-TrophyCreation" = ["echoes_of_the_void-game"]
-"echoes_of_the_void-TrophyProgression" = ["echoes_of_the_void-game"]
+

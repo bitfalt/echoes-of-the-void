@@ -31,6 +31,42 @@ pub mod game {
         pub radius: u32,
     }
 
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct PlayerMoved {
+        #[key]
+        pub player: ContractAddress,
+        pub chamber_id: u32,
+        pub x: u32,
+        pub y: u32,
+    }
+    
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct ChamberCreated {
+        #[key]
+        pub chamber_id: u32,
+        pub seed: u32,
+        pub width: u32,
+        pub height: u32,
+    }
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct ChamberEntered {
+        #[key]
+        pub player: ContractAddress,
+        pub chamber_id: u32,
+    }
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::event]
+    pub struct ChamberCompleted {
+        #[key]
+        pub player: ContractAddress,
+        pub chamber_id: u32,
+    }
+
     #[abi(embed_v0)]
     impl GameImpl of IGame<ContractState> {
         fn create_player(ref self: ContractState) {
@@ -51,6 +87,12 @@ pub mod game {
             let mut world = self.world(@"echoes_of_the_void");
             let chamber: Chamber = ChamberTrait::new(chamber_id, seed, width, height);
             world.write_model(@chamber);
+            world.emit_event(@ChamberCreated {
+                chamber_id,
+                seed,
+                width,
+                height,
+            });
         }
 
         fn enter_chamber(ref self: ContractState, chamber_id: u32) {
@@ -62,6 +104,10 @@ pub mod game {
             player_state.x = chamber.start_x;
             player_state.y = chamber.start_y;
             world.write_model(@player_state);
+            world.emit_event(@ChamberEntered {
+                player,
+                chamber_id,
+            });
         }
 
         fn move_player(ref self: ContractState, dx: i32, dy: i32) {
@@ -104,6 +150,12 @@ pub mod game {
                 player_state.y = new_y;
             }
             world.write_model(@player_state);
+            world.emit_event(@PlayerMoved {
+                player,
+                chamber_id: player_state.chamber_id,
+                x: player_state.x,
+                y: player_state.y,
+            });
         }
 
         fn emit_pulse(ref self: ContractState, radius: u32) {
@@ -128,10 +180,18 @@ pub mod game {
             let chamber: Chamber = world.read_model(player_state.chamber_id);
             assert(player_state.x == chamber.exit_x, 'Not at exit');
             assert(player_state.y == chamber.exit_y, 'Not at exit');
-            let mut run: GameRun = world.read_model(player);
+            let mut run: GameRun = world.read_model((player, 0));
             run.completed_chambers += 1;
             run.score += 100;
             world.write_model(@run);
+            world.emit_event(@ChamberCompleted {
+                player,
+                chamber_id: player_state.chamber_id,
+            });
+            player_state.chamber_id = 0;
+            player_state.x = 0;
+            player_state.y = 0;
+            world.write_model(@player_state);
         }
     }
 }
