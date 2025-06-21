@@ -22,6 +22,7 @@ mod tests {
         Chamber {
             chamber_id: 1,
             map,
+            seed: 12345,
             width: 3,
             height: 3,
             start_x: 1,
@@ -45,10 +46,8 @@ mod tests {
     fn mock_game_run(addr: ContractAddress) -> GameRun {
         GameRun {
             player: addr,
-            run_id: 0,
             score: 0,
             completed_chambers: 0,
-            timestamp: 0,
         }
     }
 

@@ -1,5 +1,8 @@
 #[starknet::interface]
 pub trait IGame<T> {
+    fn create_player(ref self: T);
+    fn create_game_run(ref self: T);
+    fn create_chamber(ref self: T, chamber_id: u32, seed: u32, width: u32, height: u32);
     fn enter_chamber(ref self: T, chamber_id: u32);
     fn move_player(ref self: T, dx: i32, dy: i32);
     fn emit_pulse(ref self: T, radius: u32);
@@ -10,9 +13,9 @@ pub trait IGame<T> {
 pub mod game {
     use super::{IGame};
     use starknet::{ContractAddress, get_caller_address};
-    use crate::models::player::Player;
-    use crate::models::chamber::Chamber;
-    use crate::models::game_run::GameRun;
+    use crate::models::player::{Player, PlayerTrait};
+    use crate::models::chamber::{Chamber, ChamberTrait};
+    use crate::models::game_run::{GameRun, GameRunTrait};
     use dojo::model::ModelStorage;
     use dojo::event::EventStorage;
     use core::traits::TryInto;
@@ -30,6 +33,26 @@ pub mod game {
 
     #[abi(embed_v0)]
     impl GameImpl of IGame<ContractState> {
+        fn create_player(ref self: ContractState) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let mut player_state: Player = PlayerTrait::new(player);
+            world.write_model(@player_state);
+        }
+
+        fn create_game_run(ref self: ContractState) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let player = get_caller_address();
+            let mut game_run: GameRun = GameRunTrait::new(player);
+            world.write_model(@game_run);
+        }
+
+        fn create_chamber(ref self: ContractState, chamber_id: u32, seed: u32, width: u32, height: u32) {
+            let mut world = self.world(@"echoes_of_the_void");
+            let chamber: Chamber = ChamberTrait::new(chamber_id, seed, width, height);
+            world.write_model(@chamber);
+        }
+
         fn enter_chamber(ref self: ContractState, chamber_id: u32) {
             let mut world = self.world(@"echoes_of_the_void");
             let player = get_caller_address();
@@ -38,8 +61,6 @@ pub mod game {
             player_state.chamber_id = chamber_id;
             player_state.x = chamber.start_x;
             player_state.y = chamber.start_y;
-            player_state.pulses_used = 0;
-            player_state.deaths = 0;
             world.write_model(@player_state);
         }
 
@@ -107,9 +128,9 @@ pub mod game {
             let chamber: Chamber = world.read_model(player_state.chamber_id);
             assert(player_state.x == chamber.exit_x, 'Not at exit');
             assert(player_state.y == chamber.exit_y, 'Not at exit');
-            let mut run: GameRun = world.read_model((player, 0)); // Example: run_id=0
+            let mut run: GameRun = world.read_model(player);
             run.completed_chambers += 1;
-            run.score += 1;
+            run.score += 100;
             world.write_model(@run);
         }
     }

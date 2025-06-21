@@ -8,6 +8,7 @@ pub struct Chamber {
     #[key]
     pub chamber_id: u32,
     pub map: Array<u8>, // 2D grid flattened, cell type as u8 (see MapCellType)
+    pub seed: u32,
     pub width: u32,
     pub height: u32,
     pub start_x: u32,
@@ -89,6 +90,7 @@ pub impl ChamberImpl of ChamberTrait {
         Chamber {
             chamber_id,
             map,
+            seed,
             width,
             height,
             start_x,
