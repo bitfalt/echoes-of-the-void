@@ -1,6 +1,6 @@
 import { useAccount } from "@starknet-react/core";
 import { useSpawnPlayer, useStartGame } from "../../dojo/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useAppStore from "../../zustand/store";
 import { useStarknetConnect } from "../../dojo/hooks/useStarknetConnect";
 import { useGame } from "../../context/game-context";
@@ -10,9 +10,10 @@ export default function WelcomeScreen() {
   const { status, handleConnect } = useStarknetConnect();
   const { address } = useAccount();
   const { initializePlayer, isInitializing, error: playerError, playerExists } = useSpawnPlayer();
-  const { startGame, gameState } = useStartGame();
+  const { startGame, gameState: startGameState } = useStartGame();
   const { player } = useAppStore();
-  const { dispatch } = useGame();
+  const { state: gameState, dispatch } = useGame();
+  const [startingGame, setStartingGame] = useState(false);
 
   // Handle sign in and player creation
   const handleSignIn = async () => {
@@ -29,32 +30,43 @@ export default function WelcomeScreen() {
 
   // Handle starting a new game
   const handleStartGame = async () => {
-    if (status === "connected" && player && !gameState.isLoading) {
+    if (status === "connected" && player && !startGameState.isLoading) {
+      setStartingGame(true);
+      
       dispatch({
         type: "SET_TX_STATUS",
         message: "Starting game...",
         txType: "pending"
       });
       
-      await startGame();
-      
-      if (!gameState.error) {
-        dispatch({
-          type: "SET_TX_STATUS",
-          message: "Game started!",
-          txType: "success"
-        });
+      try {
+        await startGame();
         
-        dispatch({
-          type: "SHOW_NOTIFICATION",
-          message: "Welcome to Echoes of the Void!"
-        });
-      } else {
+        if (!startGameState.error) {
+          dispatch({
+            type: "SET_TX_STATUS",
+            message: "Game started!",
+            txType: "success"
+          });
+          
+          // This notification is used as a trigger for the game screen transition
+          dispatch({
+            type: "SHOW_NOTIFICATION",
+            message: "Welcome to Echoes of the Void!"
+          });
+          
+          console.log("🎮 Game start successful!");
+        } else {
+          throw new Error(startGameState.error);
+        }
+      } catch (error) {
+        console.error("❌ Game start error:", error);
         dispatch({
           type: "SET_TX_STATUS",
-          message: gameState.error,
+          message: error instanceof Error ? error.message : "Failed to start game",
           txType: "error"
         });
+        setStartingGame(false);
       }
     }
   };
@@ -102,14 +114,14 @@ export default function WelcomeScreen() {
         ) : (
           <button
             onClick={handleStartGame}
-            disabled={gameState.isLoading}
+            disabled={startGameState.isLoading || startingGame}
             className={`w-full py-3 px-6 ${
-              !gameState.isLoading
+              !startGameState.isLoading && !startingGame
                 ? "bg-green-600 hover:bg-green-700"
                 : "bg-green-800 opacity-70"
             } text-white font-bold rounded-lg transition-colors`}
           >
-            {gameState.isLoading ? "Starting Game..." : "Start Game"}
+            {startGameState.isLoading || startingGame ? "Starting Game..." : "Start Game"}
           </button>
         )}
 
@@ -117,8 +129,12 @@ export default function WelcomeScreen() {
           <p className="mt-4 text-red-400">{playerError}</p>
         )}
         
-        {gameState.error && (
-          <p className="mt-4 text-red-400">{gameState.error}</p>
+        {startGameState.error && (
+          <p className="mt-4 text-red-400">{startGameState.error}</p>
+        )}
+        
+        {gameState.txStatus.type === "error" && (
+          <p className="mt-4 text-red-400">{gameState.txStatus.message}</p>
         )}
         
         {status === "connected" && address && (

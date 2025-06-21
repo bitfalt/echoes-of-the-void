@@ -29,6 +29,7 @@ export default function GameScreen() {
   const { state: gameState, dispatch } = useGame();
   
   const [currentChamberId, setCurrentChamberId] = useState(1);
+  const [pulseAnimation, setPulseAnimation] = useState(false);
 
   // Initialize the first chamber when the game starts
   useEffect(() => {
@@ -80,6 +81,10 @@ export default function GameScreen() {
         message: "Emitting pulse...",
         txType: "pending"
       });
+      
+      // Trigger pulse animation
+      setPulseAnimation(true);
+      setTimeout(() => setPulseAnimation(false), 1000);
     }
   };
 
@@ -128,6 +133,41 @@ export default function GameScreen() {
     }
   }, [moveState.txStatus, moveState.error, dispatch]);
 
+  // Handle keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (moveState.isLoading) return;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+          handleMove('up');
+          break;
+        case 'ArrowDown':
+        case 's':
+          handleMove('down');
+          break;
+        case 'ArrowLeft':
+        case 'a':
+          handleMove('left');
+          break;
+        case 'ArrowRight':
+        case 'd':
+          handleMove('right');
+          break;
+        case ' ':
+          handlePulse();
+          break;
+        case 'Enter':
+          handleCompleteLevel();
+          break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [moveState.isLoading]);
+
   // Render a cell based on its type
   const renderCell = (cell: MapCell) => {
     if (!cell.revealed) {
@@ -169,7 +209,7 @@ export default function GameScreen() {
     
     return (
       <div 
-        className="absolute w-8 h-8 flex items-center justify-center transition-all duration-300"
+        className={`absolute w-8 h-8 flex items-center justify-center transition-all duration-300 ${pulseAnimation ? 'z-20' : 'z-10'}`}
         style={{ 
           left: `${x * 32}px`, 
           top: `${y * 32}px`,
@@ -177,6 +217,13 @@ export default function GameScreen() {
         }}
       >
         <img src={characterImg} alt="Player" className="w-6 h-6" />
+        
+        {/* Pulse animation */}
+        {pulseAnimation && (
+          <div className="absolute w-48 h-48 -left-20 -top-20 animate-ping-slow">
+            <div className="w-full h-full rounded-full border-4 border-blue-400 opacity-75"></div>
+          </div>
+        )}
       </div>
     );
   };
@@ -209,7 +256,7 @@ export default function GameScreen() {
           {/* Game map */}
           {map && (
             <div 
-              className="grid gap-0 relative"
+              className="grid gap-0 relative border border-gray-800"
               style={{ 
                 gridTemplateColumns: `repeat(${map.width}, 32px)`,
                 gridTemplateRows: `repeat(${map.height}, 32px)`
@@ -228,7 +275,7 @@ export default function GameScreen() {
 
           {/* Loading state */}
           {(!map || moveState.isLoading || pulseState.isLoading) && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
               <div className="text-white">Loading...</div>
             </div>
           )}
@@ -241,7 +288,7 @@ export default function GameScreen() {
           {/* Movement controls */}
           <div className="flex flex-col items-center">
             <button
-              onClick={() => handleMove('jump')}
+              onClick={() => handleMove('up')}
               className="w-12 h-12 bg-blue-700 hover:bg-blue-600 text-white rounded-lg mb-2"
               disabled={moveState.isLoading}
             >
@@ -254,6 +301,13 @@ export default function GameScreen() {
                 disabled={moveState.isLoading}
               >
                 ←
+              </button>
+              <button
+                onClick={() => handleMove('down')}
+                className="w-12 h-12 bg-blue-700 hover:bg-blue-600 text-white rounded-lg"
+                disabled={moveState.isLoading}
+              >
+                ↓
               </button>
               <button
                 onClick={() => handleMove('right')}
@@ -283,6 +337,11 @@ export default function GameScreen() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Game instructions */}
+      <div className="bg-slate-800 border-t border-slate-700 p-2 text-center text-xs text-slate-400">
+        <p>Use arrow keys or WASD to move | Space to emit pulse | Enter to complete level</p>
       </div>
 
       {/* Status messages */}

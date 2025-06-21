@@ -5,7 +5,7 @@ import { Account } from "starknet";
 import useAppStore from "../../zustand/store";
 
 // Define the possible move directions
-export type MoveDirection = 'left' | 'right' | 'jump';
+export type MoveDirection = 'left' | 'right' | 'up' | 'down';
 
 interface MoveActionState {
   isLoading: boolean;
@@ -69,8 +69,11 @@ export const useMoveAction = (): UseMoveActionReturn => {
         case 'right':
           dx = 1;
           break;
-        case 'jump':
+        case 'up':
           dy = 1;
+          break;
+        case 'down':
+          dy = -1;
           break;
       }
 
@@ -99,8 +102,11 @@ export const useMoveAction = (): UseMoveActionReturn => {
             case 'right':
               newX = x + 1;
               break;
-            case 'jump':
+            case 'up':
               newY = y + 1;
+              break;
+            case 'down':
+              newY = y - 1;
               break;
           }
           
