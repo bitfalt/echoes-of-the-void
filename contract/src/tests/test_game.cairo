@@ -1,4 +1,3 @@
-use dojo_cairo_test::WorldStorageTestTrait;
 use echoes_of_the_void::systems::game::IGameDispatcherTrait;
 
 #[cfg(test)]

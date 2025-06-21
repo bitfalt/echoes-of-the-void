@@ -1,4 +1,3 @@
-use starknet::ContractAddress;
 use echoes_of_the_void::models::map_cell_type::MapCellType;
 use echoes_of_the_void::constants::lcg;
 
@@ -102,8 +101,7 @@ pub impl ChamberImpl of ChamberTrait {
 
 #[cfg(test)]
 mod tests {
-    use starknet::ContractAddress;
-    use echoes_of_the_void::models::chamber::{Chamber, ChamberTrait};
+    use echoes_of_the_void::models::chamber::{ChamberTrait};
     use echoes_of_the_void::models::map_cell_type::MapCellType;
 
     const WIDTH: u32 = 20;
