@@ -14,6 +14,7 @@ export default function WelcomeScreen() {
   const { player } = useAppStore();
   const { state: gameState, dispatch } = useGame();
   const [startingGame, setStartingGame] = useState(false);
+  const [transitionToGame, setTransitionToGame] = useState(false);
 
   // Handle sign in and player creation
   const handleSignIn = async () => {
@@ -30,7 +31,7 @@ export default function WelcomeScreen() {
 
   // Handle starting a new game
   const handleStartGame = async () => {
-    if (status === "connected" && player && !startGameState.isLoading) {
+    if (status === "connected" && player && !startGameState.isLoading && !startingGame) {
       setStartingGame(true);
       
       dispatch({
@@ -56,6 +57,9 @@ export default function WelcomeScreen() {
           });
           
           console.log("🎮 Game start successful!");
+          
+          // Trigger transition to game screen
+          setTransitionToGame(true);
         } else {
           throw new Error(startGameState.error);
         }
@@ -77,6 +81,33 @@ export default function WelcomeScreen() {
       initializePlayer();
     }
   }, [status, playerExists, isInitializing, initializePlayer]);
+  
+  // Force app refresh if transition is triggered
+  useEffect(() => {
+    if (transitionToGame) {
+      // Force a small delay to ensure the notification is processed
+      const timer = setTimeout(() => {
+        // Force app state refresh by updating localStorage
+        localStorage.setItem('echoes-of-the-void-game-started', 'true');
+        // Reload the app to ensure clean state transition
+        window.location.reload();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [transitionToGame]);
+
+  // Show transition screen if we're moving to the game
+  if (transitionToGame) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-blue-300">Entering the Void...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
