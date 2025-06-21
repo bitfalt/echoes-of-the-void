@@ -46,10 +46,10 @@ const policies = {
   contracts: {
     [CONTRACT_ADDRESS_GAME]: {
       methods: [
-        { name: "spawn_player", entrypoint: "spawn_player" },
-        { name: "train", entrypoint: "train" },
-        { name: "mine", entrypoint: "mine" },
-        { name: "rest", entrypoint: "rest" },
+        { name: "enter_chamber", entrypoint: "enter_chamber" },
+        { name: "move_player", entrypoint: "move_player" },
+        { name: "emit_pulse", entrypoint: "emit_pulse" },
+        { name: "complete_chamber", entrypoint: "complete_chamber" },
       ],
     },
   },
@@ -59,8 +59,8 @@ const options: ControllerOptions = {
   chains: [{ rpcUrl: getRpcUrl() }],
   defaultChainId: getDefaultChainId(),
   policies,
-  namespace: "full_starter_react",
-  slot: "full-starter-react",
+  namespace: "echoes_of_the_void",
+  slot: "echoes_of_the_void",
 };
 
 const cartridgeConnector = new ControllerConnector(

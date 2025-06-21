@@ -1,22 +1,23 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
+import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
 
-	const build_game_mine_calldata = (): DojoCall => {
+	const build_game_completeChamber_calldata = (): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "mine",
+			entrypoint: "complete_chamber",
 			calldata: [],
 		};
 	};
 
-	const game_mine = async (snAccount: Account | AccountInterface) => {
+	const game_completeChamber = async (snAccount: Account | AccountInterface) => {
 		try {
 			return await provider.execute(
-				snAccount as any,
-				build_game_mine_calldata(),
-				"full_starter_react",
+				snAccount,
+				build_game_completeChamber_calldata(),
+				"echoes_of_the_void",
 			);
 		} catch (error) {
 			console.error(error);
@@ -24,20 +25,20 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_rest_calldata = (): DojoCall => {
+	const build_game_emitPulse_calldata = (radius: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "rest",
-			calldata: [],
+			entrypoint: "emit_pulse",
+			calldata: [radius],
 		};
 	};
 
-	const game_rest = async (snAccount: Account | AccountInterface) => {
+	const game_emitPulse = async (snAccount: Account | AccountInterface, radius: BigNumberish) => {
 		try {
 			return await provider.execute(
-				snAccount as any,
-				build_game_rest_calldata(),
-				"full_starter_react",
+				snAccount,
+				build_game_emitPulse_calldata(radius),
+				"echoes_of_the_void",
 			);
 		} catch (error) {
 			console.error(error);
@@ -45,20 +46,20 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_spawnPlayer_calldata = (): DojoCall => {
+	const build_game_enterChamber_calldata = (chamberId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "spawn_player",
-			calldata: [],
+			entrypoint: "enter_chamber",
+			calldata: [chamberId],
 		};
 	};
 
-	const game_spawnPlayer = async (snAccount: Account | AccountInterface) => {
+	const game_enterChamber = async (snAccount: Account | AccountInterface, chamberId: BigNumberish) => {
 		try {
 			return await provider.execute(
-				snAccount as any,
-				build_game_spawnPlayer_calldata(),
-				"full_starter_react",
+				snAccount,
+				build_game_enterChamber_calldata(chamberId),
+				"echoes_of_the_void",
 			);
 		} catch (error) {
 			console.error(error);
@@ -66,20 +67,20 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_train_calldata = (): DojoCall => {
+	const build_game_movePlayer_calldata = (dx: BigNumberish, dy: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "train",
-			calldata: [],
+			entrypoint: "move_player",
+			calldata: [dx, dy],
 		};
 	};
 
-	const game_train = async (snAccount: Account | AccountInterface) => {
+	const game_movePlayer = async (snAccount: Account | AccountInterface, dx: BigNumberish, dy: BigNumberish) => {
 		try {
 			return await provider.execute(
-				snAccount as any,
-				build_game_train_calldata(),
-				"full_starter_react",
+				snAccount,
+				build_game_movePlayer_calldata(dx, dy),
+				"echoes_of_the_void",
 			);
 		} catch (error) {
 			console.error(error);
@@ -91,14 +92,14 @@ export function setupWorld(provider: DojoProvider) {
 
 	return {
 		game: {
-			mine: game_mine,
-			buildMineCalldata: build_game_mine_calldata,
-			rest: game_rest,
-			buildRestCalldata: build_game_rest_calldata,
-			spawnPlayer: game_spawnPlayer,
-			buildSpawnPlayerCalldata: build_game_spawnPlayer_calldata,
-			train: game_train,
-			buildTrainCalldata: build_game_train_calldata,
+			completeChamber: game_completeChamber,
+			buildCompleteChamberCalldata: build_game_completeChamber_calldata,
+			emitPulse: game_emitPulse,
+			buildEmitPulseCalldata: build_game_emitPulse_calldata,
+			enterChamber: game_enterChamber,
+			buildEnterChamberCalldata: build_game_enterChamber_calldata,
+			movePlayer: game_movePlayer,
+			buildMovePlayerCalldata: build_game_movePlayer_calldata,
 		},
 	};
 }

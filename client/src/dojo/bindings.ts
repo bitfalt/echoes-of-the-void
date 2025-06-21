@@ -1,154 +1,164 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-// Type definition for `full_starter_react::models::player::Player` struct
+import { BigNumberish } from 'starknet';
+
+// Type definition for `echoes_of_the_void::models::chamber::Chamber` struct
+export interface Chamber {
+	chamber_id: BigNumberish;
+	map: Array<BigNumberish>;
+	width: BigNumberish;
+	height: BigNumberish;
+	start_x: BigNumberish;
+	start_y: BigNumberish;
+	exit_x: BigNumberish;
+	exit_y: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::models::chamber::ChamberValue` struct
+export interface ChamberValue {
+	map: Array<BigNumberish>;
+	width: BigNumberish;
+	height: BigNumberish;
+	start_x: BigNumberish;
+	start_y: BigNumberish;
+	exit_x: BigNumberish;
+	exit_y: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::models::game_run::GameRun` struct
+export interface GameRun {
+	player: string;
+	run_id: BigNumberish;
+	score: BigNumberish;
+	completed_chambers: BigNumberish;
+	timestamp: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::models::game_run::GameRunValue` struct
+export interface GameRunValue {
+	score: BigNumberish;
+	completed_chambers: BigNumberish;
+	timestamp: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::models::player::Player` struct
 export interface Player {
-	owner: string;
-	experience: number;
-	health: number;
-	coins: number;
-	creation_day: number;
+	player: string;
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+	pulses_used: BigNumberish;
+	deaths: BigNumberish;
 }
 
-// Type definition for `full_starter_react::models::player::PlayerValue` struct
+// Type definition for `echoes_of_the_void::models::player::PlayerValue` struct
 export interface PlayerValue {
-	experience: number;
-	health: number;
-	coins: number;
-	creation_day: number;
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+	pulses_used: BigNumberish;
+	deaths: BigNumberish;
 }
 
-// Type definition for `achievement::events::index::TrophyCreation` struct
-export interface TrophyCreation {
-	id: number;
-	hidden: boolean;
-	index: number;
-	points: number;
-	start: number;
-	end: number;
-	group: number;
-	icon: number;
-	title: number;
-	description: string;
-	tasks: Array<Task>;
-	data: string;
+// Type definition for `echoes_of_the_void::systems::game::game::PulseEmitted` struct
+export interface PulseEmitted {
+	player: string;
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+	radius: BigNumberish;
 }
 
-// Type definition for `achievement::events::index::TrophyCreationValue` struct
-export interface TrophyCreationValue {
-	hidden: boolean;
-	index: number;
-	points: number;
-	start: number;
-	end: number;
-	group: number;
-	icon: number;
-	title: number;
-	description: string;
-	tasks: Array<Task>;
-	data: string;
-}
-
-// Type definition for `achievement::events::index::TrophyProgression` struct
-export interface TrophyProgression {
-	player_id: number;
-	task_id: number;
-	count: number;
-	time: number;
-}
-
-// Type definition for `achievement::events::index::TrophyProgressionValue` struct
-export interface TrophyProgressionValue {
-	count: number;
-	time: number;
-}
-
-// Type definition for `achievement::types::index::Task` struct
-export interface Task {
-	id: number;
-	total: number;
-	description: string;
+// Type definition for `echoes_of_the_void::systems::game::game::PulseEmittedValue` struct
+export interface PulseEmittedValue {
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+	radius: BigNumberish;
 }
 
 export interface SchemaType extends ISchemaType {
-	full_starter_react: {
+	echoes_of_the_void: {
+		Chamber: Chamber,
+		ChamberValue: ChamberValue,
+		GameRun: GameRun,
+		GameRunValue: GameRunValue,
 		Player: Player,
 		PlayerValue: PlayerValue,
-	},
-	achievement: {
-		TrophyCreation: TrophyCreation,
-		TrophyCreationValue: TrophyCreationValue,
-		TrophyProgression: TrophyProgression,
-		TrophyProgressionValue: TrophyProgressionValue,
-		Task: Task,
+		PulseEmitted: PulseEmitted,
+		PulseEmittedValue: PulseEmittedValue,
 	},
 }
 export const schema: SchemaType = {
-	full_starter_react: {
+	echoes_of_the_void: {
+		Chamber: {
+			chamber_id: 0,
+			map: [0],
+			width: 0,
+			height: 0,
+			start_x: 0,
+			start_y: 0,
+			exit_x: 0,
+			exit_y: 0,
+		},
+		ChamberValue: {
+			map: [0],
+			width: 0,
+			height: 0,
+			start_x: 0,
+			start_y: 0,
+			exit_x: 0,
+			exit_y: 0,
+		},
+		GameRun: {
+			player: "",
+			run_id: 0,
+			score: 0,
+			completed_chambers: 0,
+			timestamp: 0,
+		},
+		GameRunValue: {
+			score: 0,
+			completed_chambers: 0,
+			timestamp: 0,
+		},
 		Player: {
-			owner: "",
-			experience: 0,
-			health: 0,
-			coins: 0,
-			creation_day: 0,
+			player: "",
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+			pulses_used: 0,
+			deaths: 0,
 		},
 		PlayerValue: {
-			experience: 0,
-			health: 0,
-			coins: 0,
-			creation_day: 0,
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+			pulses_used: 0,
+			deaths: 0,
+		},
+		PulseEmitted: {
+			player: "",
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+			radius: 0,
+		},
+		PulseEmittedValue: {
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+			radius: 0,
 		},
 	},
-	achievement: {
-		TrophyCreation: {
-			id: 0,
-			hidden: false,
-			index: 0,
-			points: 0,
-			start: 0,
-			end: 0,
-			group: 0,
-			icon: 0,
-			title: 0,
-			description: "",
-			tasks: [{ id: 0, total: 0, description: "", }],
-			data: "",
-		},
-		TrophyCreationValue: {
-			hidden: false,
-			index: 0,
-			points: 0,
-			start: 0,
-			end: 0,
-			group: 0,
-			icon: 0,
-			title: 0,
-			description: "",
-			tasks: [{ id: 0, total: 0, description: "", }],
-			data: "",
-		},
-		TrophyProgression: {
-			player_id: 0,
-			task_id: 0,
-			count: 0,
-			time: 0,
-		},
-		TrophyProgressionValue: {
-			count: 0,
-			time: 0,
-		},
-		Task: {
-			id: 0,
-			total: 0,
-			description: "",
-		},
-	}
 };
 export enum ModelsMapping {
-	Player = 'full_starter_react-Player',
-	PlayerValue = 'full_starter_react-PlayerValue',
-	TrophyCreation = 'achievement-TrophyCreation',
-	TrophyCreationValue = 'achievement-TrophyCreationValue',
-	TrophyProgression = 'achievement-TrophyProgression',
-	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
-	Task = 'achievement-Task',
+	Chamber = 'echoes_of_the_void-Chamber',
+	ChamberValue = 'echoes_of_the_void-ChamberValue',
+	GameRun = 'echoes_of_the_void-GameRun',
+	GameRunValue = 'echoes_of_the_void-GameRunValue',
+	Player = 'echoes_of_the_void-Player',
+	PlayerValue = 'echoes_of_the_void-PlayerValue',
+	PulseEmitted = 'echoes_of_the_void-PulseEmitted',
+	PulseEmittedValue = 'echoes_of_the_void-PulseEmittedValue',
 }
