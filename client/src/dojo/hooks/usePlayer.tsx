@@ -15,20 +15,21 @@ interface UsePlayerReturn {
 // Constants
 const TORII_URL = dojoConfig.toriiUrl + "/graphql";
 const PLAYER_QUERY = `
-    query GetPlayer($playerOwner: ContractAddress!) {
-        fullStarterReactPlayerModels(where: { owner: $playerOwner }) {
-            edges {
-                node {
-                    owner
-                    experience
-                    health
-                    coins
-                    creation_day
-                }
+      query GetPlayer($playerOwner:ContractAddress!) {
+        echoesOfTheVoidPlayerModels(where:{ player: $playerOwner}) {
+          edges {
+            node {
+              player
+              chamber_id
+              x
+              y
+              pulses_used
+              deaths
             }
-            totalCount
+          }
+          totalCount
         }
-    }
+      }
 `;
 
 // Helper to convert hex values to numbers
@@ -74,11 +75,12 @@ const fetchPlayerData = async (playerOwner: string): Promise<Player | null> => {
 
     // Convert hex values to numbers - using your structure
     const playerData: Player = {
-      owner: rawPlayerData.owner,
-      experience: hexToNumber(rawPlayerData.experience),
-      health: hexToNumber(rawPlayerData.health),
-      coins: hexToNumber(rawPlayerData.coins),
-      creation_day: hexToNumber(rawPlayerData.creation_day)
+      player: rawPlayerData.owner,
+      chamber_id: hexToNumber(rawPlayerData.chamber_id),
+      x: hexToNumber(rawPlayerData.x),
+      y: hexToNumber(rawPlayerData.y),
+      pulses_used: hexToNumber(rawPlayerData.pulses_used),
+      deaths: hexToNumber(rawPlayerData.deaths)
     };
 
     console.log("✅ Player data after conversion:", playerData);
