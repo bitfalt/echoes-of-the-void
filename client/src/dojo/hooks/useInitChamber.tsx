@@ -1,8 +1,10 @@
 import { useState, useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
 import { useDojoSDK } from "@dojoengine/sdk/react";
+import { dojoConfig } from "../dojoConfig";
 import { Account } from "starknet";
-import useAppStore from "../../zustand/store";
+import useAppStore, { Player } from "../../zustand/store";
+import { Chamber } from "../../zustand/store";
 
 interface InitChamberState {
   isLoading: boolean;
@@ -18,6 +20,92 @@ interface UseInitChamberReturn {
   canInitChamber: boolean;
   resetChamberState: () => void;
 }
+
+// Constants
+const TORII_URL = dojoConfig.toriiUrl + "/graphql";
+const CHAMBER_QUERY = `
+    query GetChamber($chamberId: u32!) {
+      echoesOfTheVoidChamberModels(where: { chamber_id: $chamberId }) {
+        edges {
+          node {
+            chamber_id
+            map
+            width
+            height
+            start_x
+            start_y
+            exit_x
+            exit_y
+            seed
+          }
+        }
+        totalCount
+      }
+    }
+`
+
+// Helper to convert hex values to numbers
+const hexToNumber = (hexValue: string | number): number => {
+  if (typeof hexValue === 'number') return hexValue;
+
+  if (typeof hexValue === 'string' && hexValue.startsWith('0x')) {
+    return parseInt(hexValue, 16);
+  }
+
+  if (typeof hexValue === 'string') {
+    return parseInt(hexValue, 10);
+  }
+
+  return 0;
+};
+
+const fetchChamberData = async (chamberId: number): Promise<Chamber | null> => {
+  try {
+    console.log("🔍 Fetching chamber with id:", chamberId);
+
+    const response = await fetch(TORII_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: CHAMBER_QUERY,
+        variables: { chamberId }
+      }),
+    });
+
+    const result = await response.json();
+    console.log("📡 GraphQL response:", result);
+
+    if (!result.data?.echoesOfTheVoidChamberModels?.edges?.length) {
+      console.log("❌ No chamber found in response");
+      return null;
+    }
+
+    // Extract player data
+    const rawChamberData = result.data.echoesOfTheVoidChamberModels.edges[0].node;
+    console.log("📄 Raw chamber data:", rawChamberData);
+
+    // Convert hex values to numbers - using your structure
+    const chamberData: Chamber = {
+      chamber_id: hexToNumber(rawChamberData.chamber_id),
+      map: rawChamberData.map,
+      width: hexToNumber(rawChamberData.width),
+      height: hexToNumber(rawChamberData.height),
+      start_x: hexToNumber(rawChamberData.start_x),
+      start_y: hexToNumber(rawChamberData.start_y),
+      exit_x: hexToNumber(rawChamberData.exit_x),
+      exit_y: hexToNumber(rawChamberData.exit_y),
+      seed: hexToNumber(rawChamberData.seed)
+    };
+
+    console.log("✅ Chamber data after conversion:", chamberData);
+    return chamberData;
+
+  } catch (error) {
+    console.error("❌ Error fetching chamber:", error);
+    throw error;
+  }
+};
+
 
 export const useInitChamber = (): UseInitChamberReturn => {
   const { account, status } = useAccount();
@@ -98,17 +186,7 @@ export const useInitChamber = (): UseInitChamberReturn => {
           enterChamber(targetChamberId);
           
           // Create chamber object to update in the store
-          const chamberData = {
-            chamber_id: targetChamberId,
-            seed,
-            width,
-            height,
-            start_x: 0, // These will be updated from the contract
-            start_y: 0,
-            exit_x: width - 1, // Placeholder
-            exit_y: height - 1,
-            map: new Array(width * height).fill(1) // Initialize with all PATH cells
-          };
+          const chamberData = await fetchChamberData(targetChamberId);
           
           // Update current chamber in the store
           setChamber(chamberData);
