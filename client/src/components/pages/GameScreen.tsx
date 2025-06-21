@@ -53,8 +53,13 @@ export default function GameScreen() {
         x: player.x, 
         y: player.y 
       });
+      
+      // Check if player is at the exit cell
+      if (map && map.exit && player.x === map.exit.x && player.y === map.exit.y) {
+        handleCompleteLevel();
+      }
     }
-  }, [player, dispatch]);
+  }, [player, dispatch, map]);
 
   // Handle player movement
   const handleMove = (direction: MoveDirection) => {
@@ -109,6 +114,12 @@ export default function GameScreen() {
         type: "COMPLETE_CHAMBER",
         nextChamberId
       });
+      
+      // Show notification
+      dispatch({
+        type: "SHOW_NOTIFICATION",
+        message: `Chamber ${currentChamberId} completed!`
+      });
     }
   };
 
@@ -157,9 +168,6 @@ export default function GameScreen() {
           break;
         case ' ':
           handlePulse();
-          break;
-        case 'Enter':
-          handleCompleteLevel();
           break;
       }
     };
@@ -328,20 +336,13 @@ export default function GameScreen() {
             >
               Emit Pulse
             </button>
-            <button
-              onClick={handleCompleteLevel}
-              className="px-6 py-3 bg-green-700 hover:bg-green-600 text-white rounded-lg"
-              disabled={chamberState.isLoading}
-            >
-              Complete Level
-            </button>
           </div>
         </div>
       </div>
 
       {/* Game instructions */}
       <div className="bg-slate-800 border-t border-slate-700 p-2 text-center text-xs text-slate-400">
-        <p>Use arrow keys or WASD to move | Space to emit pulse | Enter to complete level</p>
+        <p>Use arrow keys or WASD to move | Space to emit pulse | Reach the exit to complete the chamber</p>
       </div>
 
       {/* Status messages */}
