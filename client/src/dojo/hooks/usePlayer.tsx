@@ -63,6 +63,7 @@ const fetchPlayerData = async (playerOwner: string): Promise<Player | null> => {
 
     const result = await response.json();
     console.log("📡 GraphQL response:", result);
+    console.log("GRAPHQL URL:", TORII_URL);
 
     if (!result.data?.echoesOfTheVoidPlayerModels?.edges?.length) {
       console.log("❌ No player found in response");

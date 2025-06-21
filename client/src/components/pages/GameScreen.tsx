@@ -33,7 +33,7 @@ export default function GameScreen() {
 
   // Initialize the first chamber when the game starts
   useEffect(() => {
-    if (isConnected && player && !player.chamber_id) {
+    if (isConnected && player && player.chamber_id === 0) {
       initChamber(currentChamberId);
     }
   }, [isConnected, player, currentChamberId, initChamber]);

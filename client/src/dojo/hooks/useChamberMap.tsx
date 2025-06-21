@@ -4,11 +4,12 @@ import useAppStore from "../../zustand/store";
 
 // Define cell types
 export enum CellType {
-  VOID = 0,      // Not yet revealed
-  PATH = 1,      // Walkable path
-  WALL = 2,      // Solid wall
-  START = 3,     // Starting position
-  EXIT = 4       // Level exit
+  WALL = 0,      // Not yet revealed
+  PLAYER = 1,    // Player
+  PATH = 2,      // Walkable path
+  VOID = 3,      // Void
+  EXIT = 4,       // Level exit
+  START = 5       // Starting position
 }
 
 // Define a cell in the map

@@ -190,6 +190,7 @@ export const useInitChamber = (): UseInitChamberReturn => {
           
           // Update current chamber in the store
           setChamber(chamberData);
+          console.log("🔄 Chamber data after enter:", chamberData);
 
           setChamberState(prev => ({
             ...prev,
