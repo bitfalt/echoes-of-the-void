@@ -14,19 +14,21 @@ export interface Player {
 export interface Chamber {
   chamber_id: number;
   map: string; // TODO: This is an array of numbers, modify it
-  seed: number;
   width: number;
   height: number;
   start_x: number;
   start_y: number;
   exit_x: number;
   exit_y: number;
+  seed: number;
 }
 
 export interface GameRun {
   player: string;
+  run_id: number;
   score: number;
   completed_chambers: number;
+  timestamp: number;
 }
 
 // Application state
