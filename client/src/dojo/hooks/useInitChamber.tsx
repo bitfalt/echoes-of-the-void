@@ -88,7 +88,7 @@ export const useInitChamber = (): UseInitChamberReturn => {
         // Now enter the chamber
         console.log(`📤 Executing enter chamber ${targetChamberId} transaction...`);
         
-        const enterTx = await client.game.enter_chamber(account as Account, targetChamberId);
+        const enterTx = await client.game.enterChamber(account as Account, targetChamberId);
         console.log("📥 Enter chamber transaction response:", enterTx);
 
         if (enterTx && enterTx.code === "SUCCESS") {
