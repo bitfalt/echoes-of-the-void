@@ -13,7 +13,7 @@ export interface Player {
 
 export interface Chamber {
   chamber_id: number;
-  map: string; // TODO: This is an array of numbers, modify it
+  map: number[]; // Array of cell types (0=void, 1=path, 2=wall, 3=start, 4=exit)
   width: number;
   height: number;
   start_x: number;

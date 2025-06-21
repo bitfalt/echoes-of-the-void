@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x5344fcfd6872993f4a929deaed6a788b38771aab6ff66809d3f5f138c45eeda",
-      "class_hash": "0x22309a423091d146fdc62cb5c41f280ab8ce085297ff63bffa30ad8f3b8f1ae",
+      "address": "0x719f23379226c2c0f23f7429b08f80ab2434b82d39549f5a557f799f5e219f",
+      "class_hash": "0x484f92e8a72d7df7f10dfb268408d011599681cfd4a7bacd140c1ed5931528e",
       "abi": [
         {
           "type": "impl",
@@ -1390,6 +1390,44 @@
           "type": "interface",
           "name": "echoes_of_the_void::systems::game::IGame",
           "items": [
+            {
+              "type": "function",
+              "name": "create_player",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "create_game_run",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "create_chamber",
+              "inputs": [
+                {
+                  "name": "chamber_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "seed",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "width",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "height",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
             {
               "type": "function",
               "name": "enter_chamber",
@@ -1558,6 +1596,9 @@
       "tag": "echoes_of_the_void-game",
       "selector": "0x1e1b0c530c4acd7602a6049410ebe806416e3700f820978140f9fa2e9d2fe99",
       "systems": [
+        "create_player",
+        "create_game_run",
+        "create_chamber",
         "enter_chamber",
         "move_player",
         "emit_pulse",
@@ -1570,7 +1611,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x3d09cc0c2869c82fc8679035fb9a8c979b92327082a0671ef66a34afc72c451",
+      "class_hash": "0xc668998b5ca71dd4853fdae6cb0e6e0ca9270cc30eb90ed4912f599259aeb2",
       "tag": "echoes_of_the_void-Chamber",
       "selector": "0x57a5280dda7e26adf4a1dea2d4f5cb29139759dcdf4f4279632dc2e1a3fafd6"
     },
@@ -1588,6 +1629,30 @@
     }
   ],
   "events": [
+    {
+      "members": [],
+      "class_hash": "0xec1827db5bdfb70ea41cfc5d56bcc5c74ec8f6de52c91b828f4634e44261",
+      "tag": "echoes_of_the_void-ChamberCompleted",
+      "selector": "0xf0c31270c7e94f5c05fbb07e699b0262c1456c1e242834fd19bb4a549550d9"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7cb4c06e62d97247d26de0a76c327f8b0862295216c0634885e34f9764d7264",
+      "tag": "echoes_of_the_void-ChamberCreated",
+      "selector": "0x1fbb948e550300d3c624c636daa0dbb71d2f768d96ab445ba19d0b0da5a5017"
+    },
+    {
+      "members": [],
+      "class_hash": "0x3c5c59ea3250b277a98d87892addac3a9dcf6c060a78ee71b11ed5794f5b116",
+      "tag": "echoes_of_the_void-ChamberEntered",
+      "selector": "0x2bfb94fd941268f1a3203057824a0370c0cce75a0838b950df147bb5217fa82"
+    },
+    {
+      "members": [],
+      "class_hash": "0x58a11962265721af39123468ade3e71bfdb8eb9825e5aff6b3b63cd3b9bbb7e",
+      "tag": "echoes_of_the_void-PlayerMoved",
+      "selector": "0x3d3e2b4b958a5a7a5f57dc84da93da6f31563b2a6d052fcb1e6d8408543dd38"
+    },
     {
       "members": [],
       "class_hash": "0x1cbaabf452dbdd3e6334a27984dd2fdef9203c2a0b5c962cdebe5a1437587dc",
