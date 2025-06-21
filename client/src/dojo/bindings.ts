@@ -12,6 +12,7 @@ export interface Chamber {
 	start_y: BigNumberish;
 	exit_x: BigNumberish;
 	exit_y: BigNumberish;
+	seed: BigNumberish;
 }
 
 // Type definition for `echoes_of_the_void::models::chamber::ChamberValue` struct
@@ -23,6 +24,7 @@ export interface ChamberValue {
 	start_y: BigNumberish;
 	exit_x: BigNumberish;
 	exit_y: BigNumberish;
+	seed: BigNumberish;
 }
 
 // Type definition for `echoes_of_the_void::models::game_run::GameRun` struct
@@ -60,6 +62,58 @@ export interface PlayerValue {
 	deaths: BigNumberish;
 }
 
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberCompleted` struct
+export interface ChamberCompleted {
+	player: string;
+	chamber_id: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberCompletedValue` struct
+export interface ChamberCompletedValue {
+	chamber_id: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberCreated` struct
+export interface ChamberCreated {
+	chamber_id: BigNumberish;
+	seed: BigNumberish;
+	width: BigNumberish;
+	height: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberCreatedValue` struct
+export interface ChamberCreatedValue {
+	seed: BigNumberish;
+	width: BigNumberish;
+	height: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberEntered` struct
+export interface ChamberEntered {
+	player: string;
+	chamber_id: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::ChamberEnteredValue` struct
+export interface ChamberEnteredValue {
+	chamber_id: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::PlayerMoved` struct
+export interface PlayerMoved {
+	player: string;
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+}
+
+// Type definition for `echoes_of_the_void::systems::game::game::PlayerMovedValue` struct
+export interface PlayerMovedValue {
+	chamber_id: BigNumberish;
+	x: BigNumberish;
+	y: BigNumberish;
+}
+
 // Type definition for `echoes_of_the_void::systems::game::game::PulseEmitted` struct
 export interface PulseEmitted {
 	player: string;
@@ -85,6 +139,14 @@ export interface SchemaType extends ISchemaType {
 		GameRunValue: GameRunValue,
 		Player: Player,
 		PlayerValue: PlayerValue,
+		ChamberCompleted: ChamberCompleted,
+		ChamberCompletedValue: ChamberCompletedValue,
+		ChamberCreated: ChamberCreated,
+		ChamberCreatedValue: ChamberCreatedValue,
+		ChamberEntered: ChamberEntered,
+		ChamberEnteredValue: ChamberEnteredValue,
+		PlayerMoved: PlayerMoved,
+		PlayerMovedValue: PlayerMovedValue,
 		PulseEmitted: PulseEmitted,
 		PulseEmittedValue: PulseEmittedValue,
 	},
@@ -100,6 +162,7 @@ export const schema: SchemaType = {
 			start_y: 0,
 			exit_x: 0,
 			exit_y: 0,
+			seed: 0,
 		},
 		ChamberValue: {
 			map: [0],
@@ -109,6 +172,7 @@ export const schema: SchemaType = {
 			start_y: 0,
 			exit_x: 0,
 			exit_y: 0,
+			seed: 0,
 		},
 		GameRun: {
 			player: "",
@@ -137,6 +201,42 @@ export const schema: SchemaType = {
 			pulses_used: 0,
 			deaths: 0,
 		},
+		ChamberCompleted: {
+			player: "",
+			chamber_id: 0,
+		},
+		ChamberCompletedValue: {
+			chamber_id: 0,
+		},
+		ChamberCreated: {
+			chamber_id: 0,
+			seed: 0,
+			width: 0,
+			height: 0,
+		},
+		ChamberCreatedValue: {
+			seed: 0,
+			width: 0,
+			height: 0,
+		},
+		ChamberEntered: {
+			player: "",
+			chamber_id: 0,
+		},
+		ChamberEnteredValue: {
+			chamber_id: 0,
+		},
+		PlayerMoved: {
+			player: "",
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+		},
+		PlayerMovedValue: {
+			chamber_id: 0,
+			x: 0,
+			y: 0,
+		},
 		PulseEmitted: {
 			player: "",
 			chamber_id: 0,
@@ -159,6 +259,14 @@ export enum ModelsMapping {
 	GameRunValue = 'echoes_of_the_void-GameRunValue',
 	Player = 'echoes_of_the_void-Player',
 	PlayerValue = 'echoes_of_the_void-PlayerValue',
+	ChamberCompleted = 'echoes_of_the_void-ChamberCompleted',
+	ChamberCompletedValue = 'echoes_of_the_void-ChamberCompletedValue',
+	ChamberCreated = 'echoes_of_the_void-ChamberCreated',
+	ChamberCreatedValue = 'echoes_of_the_void-ChamberCreatedValue',
+	ChamberEntered = 'echoes_of_the_void-ChamberEntered',
+	ChamberEnteredValue = 'echoes_of_the_void-ChamberEnteredValue',
+	PlayerMoved = 'echoes_of_the_void-PlayerMoved',
+	PlayerMovedValue = 'echoes_of_the_void-PlayerMovedValue',
 	PulseEmitted = 'echoes_of_the_void-PulseEmitted',
 	PulseEmittedValue = 'echoes_of_the_void-PulseEmittedValue',
 }
