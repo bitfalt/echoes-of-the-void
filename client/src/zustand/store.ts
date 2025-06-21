@@ -11,10 +11,34 @@ export interface Player {
   deaths: number;
 }
 
+export interface Chamber {
+  chamber_id: number;
+  map: string; // TODO: This is an array of numbers, modify it
+  seed: number;
+  width: number;
+  height: number;
+  start_x: number;
+  start_y: number;
+  exit_x: number;
+  exit_y: number;
+}
+
+export interface GameRun {
+  player: string;
+  score: number;
+  completed_chambers: number;
+}
+
 // Application state
 interface AppState {
   // Player data
   player: Player | null;
+
+  // Chamber data
+  chamber: Chamber | null;
+
+  // Game run data
+  gameRun: GameRun | null;
   
   // UI state
   isLoading: boolean;
@@ -27,11 +51,19 @@ interface AppState {
 // Store actions
 interface AppActions {
   // Player actions
+  createPlayer: () => void;
   setPlayer: (player: Player | null) => void;
   movePlayer: (x: number, y: number) => void;
   emitPulse: () => void;
 
-  
+  // Chamber actions
+  createChamber: (chamber_id: number, seed: number, width: number, height: number) => void;
+  setChamber: (chamber: Chamber | null) => void;
+
+  // Game run actions
+  createGameRun: () => void;
+  setGameRun: (gameRun: GameRun | null) => void;
+
   // UI actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -50,6 +82,8 @@ type AppStore = AppState & AppActions;
 // Initial state
 const initialState: AppState = {
   player: null,
+  chamber: null,
+  gameRun: null,
   isLoading: false,
   error: null,
   gameStarted: false,
@@ -63,6 +97,10 @@ const useAppStore = create<AppStore>()(
       ...initialState,
 
       // Player actions
+      createPlayer: () => set((state) => ({
+        player: state.player ? { ...state.player, chamber_id: 0 } : null
+      })),
+
       setPlayer: (player) => set({ player }),
 
       movePlayer: (x, y) => set((state) => ({
@@ -73,6 +111,19 @@ const useAppStore = create<AppStore>()(
         player: state.player ? { ...state.player, pulses_used: state.player.pulses_used + 1 } : null
       })),
       
+      // Chamber actions
+      createChamber: (chamber_id, seed, width, height) => set((state) => ({
+        chamber: state.chamber ? { ...state.chamber, chamber_id, seed, width, height } : null
+      })),
+
+      setChamber: (chamber) => set({ chamber }),
+
+      // Game run actions
+      createGameRun: () => set((state) => ({
+        gameRun: state.gameRun ? { ...state.gameRun, score: 0, completed_chambers: 0 } : null
+      })),
+
+      setGameRun: (gameRun) => set({ gameRun }),
 
       // UI actions
       setLoading: (isLoading) => set({ isLoading }),
@@ -84,7 +135,8 @@ const useAppStore = create<AppStore>()(
       })),
       
       completeChamber: () => set((state) => ({
-        player: state.player ? { ...state.player, chamber_id: state.player.chamber_id + 1 } : null
+        player: state.player ? { ...state.player, chamber_id: 0 } : null,
+        gameRun: state.gameRun ? { ...state.gameRun, score: state.gameRun.score + 100, completed_chambers: state.gameRun.completed_chambers + 1 } : null
       })),
 
       // Utility actions
