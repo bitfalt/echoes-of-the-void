@@ -17,26 +17,15 @@ export default function WelcomeScreen() {
   const [startingGame, setStartingGame] = useState(false);
   const [transitionToGame, setTransitionToGame] = useState(false);
 
-  // Prevent scrolling and ensure black background
+  // Ensure black background
   useEffect(() => {
-    // Prevent scrolling
-    document.body.style.overflow = 'hidden';
-    document.body.style.height = '100vh';
     document.body.style.backgroundColor = 'black';
-    
-    // Ensure html element also has black background
     document.documentElement.style.backgroundColor = 'black';
-    document.documentElement.style.overflow = 'hidden';
-    document.documentElement.style.height = '100vh';
 
     return () => {
       // Cleanup when component unmounts
-      document.body.style.overflow = '';
-      document.body.style.height = '';
       document.body.style.backgroundColor = '';
       document.documentElement.style.backgroundColor = '';
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.height = '';
     };
   }, []);
 
@@ -134,9 +123,11 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black overflow-hidden">
+    <div className="flex flex-col items-center justify-start bg-black min-h-screen py-20 px-4">
       {/* Particle background */}
-      <ParticleBackground />
+      <div className="fixed inset-0 z-0">
+        <ParticleBackground />
+      </div>
       
       {/* Static noise background effect */}
       <div className="absolute inset-0 opacity-10" style={{ 
@@ -156,7 +147,7 @@ export default function WelcomeScreen() {
           Navigate by emitting sound pulses that momentarily reveal the hidden map.
         </p>
 
-        <div className="max-w-sm sm:max-w-md mx-auto px-4">
+        <div className="max-w-sm sm:max-w-md mx-auto px-4 pb-12">
           {status !== "connected" ? (
             <button
               onClick={handleSignIn}

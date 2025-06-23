@@ -6,6 +6,8 @@
 > A minimalist exploration game built on Starknet with the Dojo Engine.
 > Navigate through dark chambers, use your pulse to reveal the path, and avoid the void
 
+Map generation WIP, right now it is a bit buggy and sometimes the exit is unreachable. However core mechanics still apply
+
 ## ✨ What's Included
 
 **🎨 Frontend**
