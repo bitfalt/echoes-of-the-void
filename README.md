@@ -1,138 +1,66 @@
-# 🎮 Dojo Game Starter
-
-> **The fastest way to build onchain games on Starknet**
-> From zero to deployed in 5 minutes ⚡
 
 <div align="center">
-  <img src="./client/src/assets/Dojo-Logo-Stylized-Red.svg" alt="Dojo Engine" height="60"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="./client/src/assets/DojoByExample_logo.svg" alt="Dojo by Example" height="60"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="./client/src/assets/SN-Linear-Gradient.svg" alt="Starknet" height="60"/>
+  <img src="./client/src/assets/logo.png" alt="Echoes of the Void" height="500"/>
 </div>
+
+> A minimalist exploration game built on Starknet with the Dojo Engine.
+> Navigate through dark chambers, use your pulse to reveal the path, and avoid the void
 
 ## ✨ What's Included
 
-**🎨 Frontend Ready**
-- React + Vite + TypeScript with complete Dojo integration
-- Cartridge Controller wallet integration with session policies
-- Real-time game UI with optimistic updates
-- Comprehensive hooks for blockchain operations
+**🎨 Frontend**
+- React + Vite + TypeScript with complete Dojo integration.
+- Cartridge Controller wallet integration for a seamless user experience.
+- Real-time, grid-based game UI with effects and animations.
+- Custom React hooks for all on-chain player actions.
 
-**⚙️ Backend Complete**
-- Cairo smart contracts with Dojo Engine architecture
-- Player progression system with experience, health, and coins
-- Integrated achievement system with 5+ achievements
-- Production-ready deployment configuration
+**⚙️ Backend**
+- Cairo smart contracts built with the Dojo Engine.
+- On-chain player state tracking including position, deaths, and pulses used.
+- Game systems for movement, exploration, and progression.
 
 ## 🛠️ Tech Stack
 
 ```
 Frontend: React + Vite + TypeScript + TailwindCSS + Zustand
 Backend:  Cairo + Dojo Engine + Torii GraphQL Indexer
-Network:  Starknet (Local/Sepolia/Mainnet)
+Network:  Starknet (Local/Sepolia)
 Wallet:   Cartridge Controller
 ```
 
-## 📦 Project Structure
-
-```
-dojo-game-starter/
-├── 📱 client/                    # Complete React + Dojo integration
-│   ├── src/dojo/                 # Core Dojo integration files
-│   │   ├── bindings.ts           # TypeScript interfaces from Cairo
-│   │   ├── dojoConfig.ts         # Network and connection configuration
-│   │   ├── contracts.gen.ts      # Auto-generated contract functions
-│   │   └── hooks/                # Custom React hooks for blockchain
-│   ├── docs/                     # 📚 Complete integration documentation
-│   └── README.md                 # Frontend-specific documentation
-├── ⚙️ contract/                 # Cairo smart contracts
-│   ├── src/
-│   │   ├── models/               # Data entities (Player model)
-│   │   ├── systems/              # Game logic (train, mine, rest)
-│   │   ├── achievements/         # Achievement system implementation
-│   │   └── store/                # Data layer abstraction
-│   └── README.md                 # Backend development and deployment guide
-└── tests/                        # Integration tests
-```
-
-## 📚 Documentation
-
-### **🎨 Frontend Integration**
-The `client/` directory contains a complete React + Dojo integration with comprehensive documentation:
-
-📖 **[Client Documentation](./client/README.md)** - Start here for frontend development
-
-**Complete Integration Guide Series:**
-- **[01. Overview](./client/docs/01-overview.md)** - Architecture and concepts
-- **[02. Architecture](./client/docs/02-architecture.md)** - System design patterns
-- **[03. Core Files](./client/docs/03-core-files.md)** - Essential integration files
-- **[04. Zustand State Management](./client/docs/04-zustand-state-management.md)** - Optimistic updates
-- **[05. Cartridge Controller](./client/docs/05-cartridge-controller.md)** - Gaming wallet UX
-- **[06. React Hooks Pattern](./client/docs/06-react-hooks-pattern.md)** - Blockchain hooks
-- **[07. Data Flow](./client/docs/07-data-flow.md)** - Request/response cycles
-- **[08. Extending the System](./client/docs/08-extending-system.md)** - Building your game
-
-### **⚙️ Backend Development**
-The `contract/` directory contains Cairo smart contracts with Dojo Engine:
-
-📖 **[Contracts Documentation](./contract/README.md)** - Backend development guide
-
-**Key Topics Covered:**
-- **Project Structure** - Models, Systems, Store architecture
-- **Game Mechanics** - Player actions (spawn, train, mine, rest)
-- **Achievement System** - Complete trophy/task implementation
-- **Local Development** - Katana, Sozo, Torii setup
-- **Sepolia Deployment** - Production deployment process
-- **Testing Strategy** - Integration tests and best practices
-
 ## 🎮 Game Mechanics
 
-The starter demonstrates essential onchain game patterns:
+The core gameplay revolves around exploration and survival in a dark, mysterious world.
 
-| Action | Effect | Demonstrates |
-|--------|--------|--------------|
-| 🏋️ **Train** | +10 Experience | Pure advancement mechanics |
-| ⛏️ **Mine** | +5 Coins, -5 Health | Risk/reward decision making |
-| 💤 **Rest** | +20 Health | Resource management systems |
+| Action | Effect | Description |
+|--------|--------|-------------|
+| ⬅️⬆️➡️⬇️ **Move** | Changes player position | Navigate the chamber one cell at a time. Walls block your path. |
+| 💥 **Emit Pulse** | Temporarily reveals your surroundings | Use a pulse to see through the fog of war. This action has a cooldown. |
+| ☠️ **Fall into Void** | Player dies and respawns at the entrance | Falling into a void cell resets your position and increases your death count. |
 
-**🏆 Achievement System:**
-- **MiniGamer** (1 action) → **SenseiGamer** (50 actions)
-- Complete integration with frontend achievement display
-- Automatic progress tracking for all game actions
+**Objective:**
+Your goal is to navigate from the **Entrance** to the **Exit** of each chamber.
 
-## 🎯 Perfect For
-
-- 🏆 **Hackathon teams** needing rapid onchain game setup
-- 🎮 **Game developers** entering Web3 with production patterns
-- 🏢 **Studios** prototyping blockchain games with real UX
-- 📚 **Developers** learning Starknet + Dojo with comprehensive examples
+**🏆 Stats Tracked:**
+- Chambers Completed
+- Pulses Used
+- Deaths
 
 ## 🚀 Key Features
 
-**⚡ Gaming-First UX**
-- Cartridge Controller integration eliminates wallet friction
-- Session policies enable uninterrupted gameplay
-- Optimistic updates provide instant feedback
-- Background blockchain confirmation
+**⚡ Onchain Gameplay**
+- All core game logic and player state are managed by Cairo smart contracts on Starknet.
+- Cartridge Controller integration for easy wallet management and session keys.
 
-**🔧 Developer Experience**
-- Complete TypeScript integration end-to-end
-- Hot reload with contract changes
-- Comprehensive error handling patterns
-- Production deployment configurations
-
-**🏗️ Scalable Architecture**
-- Modular component design for easy extension
-- Reusable hooks for blockchain operations
-- Clean separation between UI and blockchain logic
-- Performance optimizations built-in
+**🔧 Modern Frontend**
+- Built with React, Vite, and TypeScript for a robust and maintainable codebase.
+- Real-time UI updates that reflect the on-chain state.
 
 ## 🌟 Getting Started
 
-1. **For Frontend Development:** Start with [Client README](./client/README.md)
-2. **For Backend Development:** Check [Contracts README](./contract/README.md)
-3. **For Complete Understanding:** Follow the [Integration Guide Series](./client/docs/)
+1. **For Frontend Development:** See the [Client README](./client/README.md)
+2. **For Backend Development:** See the [Contracts README](./contract/README.md)
+3. **For a Complete Overview:** Read the [Integration Guide Series](./client/docs/)
 
 ## 🔗 Links
 
