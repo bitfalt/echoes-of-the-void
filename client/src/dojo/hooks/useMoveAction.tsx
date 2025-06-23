@@ -70,10 +70,10 @@ export const useMoveAction = (): UseMoveActionReturn => {
           dx = 1;
           break;
         case 'up':
-          dy = 1;
+          dy = -1;
           break;
         case 'down':
-          dy = -1;
+          dy = 1;
           break;
       }
 
@@ -103,10 +103,10 @@ export const useMoveAction = (): UseMoveActionReturn => {
               newX = x + 1;
               break;
             case 'up':
-              newY = y + 1;
+              newY = y - 1;
               break;
             case 'down':
-              newY = y - 1;
+              newY = y + 1;
               break;
           }
           

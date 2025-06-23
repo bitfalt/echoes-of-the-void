@@ -18,7 +18,7 @@ function App() {
 // Inner component that can use the GameProvider context
 function AppContent() {
   const { isConnected } = useAccount();
-  const { player, gameRun } = useAppStore();
+  const { player } = useAppStore();
   const { state: gameState, dispatch } = useGame();
   const [gameStarted, setGameStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,12 +39,10 @@ function AppContent() {
     if (isLoading) return;
     
     // Game is considered started if:
-    // 1. User is connected
-    // 2. Player exists
-    // 3. GameRun exists with a valid score
-    // 4. OR the gameState indicates the game has been started
+    // 1. User is connected AND player exists
+    // 2. OR the gameState indicates the game has been started via notification
     if (
-      (isConnected && player && gameRun && gameRun.score >= 0) ||
+      (isConnected && player) ||
       (gameState.notification === "Welcome to Echoes of the Void!")
     ) {
       console.log("🎮 Game detected as started");
@@ -61,7 +59,7 @@ function AppContent() {
       console.log("🎮 Game not started yet");
       setGameStarted(false);
     }
-  }, [isConnected, player, gameRun, gameState.notification, gameState.chamberId, dispatch, isLoading]);
+  }, [isConnected, player, gameState.notification, gameState.chamberId, dispatch, isLoading]);
 
   // Log state changes for debugging
   useEffect(() => {
@@ -69,20 +67,19 @@ function AppContent() {
       console.log("Game state updated:", { 
         isConnected, 
         playerExists: !!player, 
-        gameRunExists: !!gameRun,
         gameStarted,
         notification: gameState.notification
       });
     }
-  }, [isConnected, player, gameRun, gameStarted, gameState.notification, isLoading]);
+  }, [isConnected, player, gameStarted, gameState.notification, isLoading]);
 
   // Show loading screen during initial load
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-blue-300">Loading Echoes of the Void...</p>
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white font-mono text-lg">Loading Echoes of the Void...</p>
         </div>
       </div>
     );

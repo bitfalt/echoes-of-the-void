@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import useAppStore from "../../zustand/store";
 import { useStarknetConnect } from "../../dojo/hooks/useStarknetConnect";
 import { useGame } from "../../context/game-context";
-import logoImage from "../../assets/logo.png";
+import Logo from "../ui/Logo";
+import ParticleBackground from "../ui/particle-background";
 
 export default function WelcomeScreen() {
   const { status, handleConnect } = useStarknetConnect();
@@ -15,6 +16,29 @@ export default function WelcomeScreen() {
   const { state: gameState, dispatch } = useGame();
   const [startingGame, setStartingGame] = useState(false);
   const [transitionToGame, setTransitionToGame] = useState(false);
+
+  // Prevent scrolling and ensure black background
+  useEffect(() => {
+    // Prevent scrolling
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.body.style.backgroundColor = 'black';
+    
+    // Ensure html element also has black background
+    document.documentElement.style.backgroundColor = 'black';
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.height = '100vh';
+
+    return () => {
+      // Cleanup when component unmounts
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.backgroundColor = '';
+      document.documentElement.style.backgroundColor = '';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+    };
+  }, []);
 
   // Handle sign in and player creation
   const handleSignIn = async () => {
@@ -100,79 +124,96 @@ export default function WelcomeScreen() {
   // Show transition screen if we're moving to the game
   if (transitionToGame) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-blue-300">Entering the Void...</p>
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white font-mono text-lg">Entering the Void...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
-      <div className="text-center p-8 max-w-md">
-        <div className="mb-8 flex justify-center">
-          <img src={logoImage} alt="Echoes of the Void" className="w-64 h-auto" />
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black overflow-hidden">
+      {/* Particle background */}
+      <ParticleBackground />
+      
+      {/* Static noise background effect */}
+      <div className="absolute inset-0 opacity-10" style={{ 
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+        backgroundSize: '200px',
+        zIndex: 2
+      }}></div>
+      
+      <div className="text-center px-4 sm:px-8 max-w-6xl w-full z-10 relative">
+        {/* Logo - now the main focal point */}
+        <div>
+          <Logo />
         </div>
         
-        <h1 className="text-4xl font-bold text-blue-300 mb-6">Echoes of the Void</h1>
-        
-        <p className="text-blue-100 mb-8">
+        <p className="text-gray-300 mb-8 sm:mb-12 font-mono text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto px-4">
           A minimalist, turn-based puzzle-platformer set in a completely dark environment.
           Navigate by emitting sound pulses that momentarily reveal the hidden map.
         </p>
 
-        {status !== "connected" ? (
-          <button
-            onClick={handleSignIn}
-            className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
-          >
-            Connect Controller
-          </button>
-        ) : !playerExists ? (
-          <button
-            onClick={handleSignIn}
-            disabled={isInitializing}
-            className={`w-full py-3 px-6 ${
-              !isInitializing
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-blue-800 opacity-70"
-            } text-white font-bold rounded-lg transition-colors`}
-          >
-            {isInitializing ? "Creating Player..." : "Create Player"}
-          </button>
-        ) : (
-          <button
-            onClick={handleStartGame}
-            disabled={startGameState.isLoading || startingGame}
-            className={`w-full py-3 px-6 ${
-              !startGameState.isLoading && !startingGame
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-green-800 opacity-70"
-            } text-white font-bold rounded-lg transition-colors`}
-          >
-            {startGameState.isLoading || startingGame ? "Starting Game..." : "Start Game"}
-          </button>
-        )}
+        <div className="max-w-sm sm:max-w-md mx-auto px-4">
+          {status !== "connected" ? (
+            <button
+              onClick={handleSignIn}
+              className="w-full py-3 sm:py-4 px-4 sm:px-6 bg-white hover:bg-gray-200 text-black font-bold font-mono rounded-none border-2 border-white hover:border-gray-400 transition-all duration-200 relative overflow-hidden group text-sm sm:text-base"
+              style={{ clipPath: 'polygon(0 0, 100% 0, 95% 100%, 5% 100%)' }}
+            >
+              <span className="relative z-10">CONNECT CONTROLLER</span>
+              <span className="absolute inset-0 bg-gray-200 transform scale-x-0 origin-left transition-transform duration-200 group-hover:scale-x-100"></span>
+            </button>
+          ) : !playerExists ? (
+            <button
+              onClick={handleSignIn}
+              disabled={isInitializing}
+              className={`w-full py-3 sm:py-4 px-4 sm:px-6 ${
+                !isInitializing
+                  ? "bg-white hover:bg-gray-200 text-black"
+                  : "bg-gray-600 text-white opacity-70"
+              } font-bold font-mono rounded-none border-2 border-white transition-all duration-200 relative overflow-hidden group text-sm sm:text-base`}
+              style={{ clipPath: 'polygon(0 0, 100% 0, 95% 100%, 5% 100%)' }}
+            >
+              <span className="relative z-10">{isInitializing ? "CREATING PLAYER..." : "CREATE PLAYER"}</span>
+              <span className="absolute inset-0 bg-gray-200 transform scale-x-0 origin-left transition-transform duration-200 group-hover:scale-x-100"></span>
+            </button>
+          ) : (
+            <button
+              onClick={handleStartGame}
+              disabled={startGameState.isLoading || startingGame}
+              className={`w-full py-3 sm:py-4 px-4 sm:px-6 ${
+                !startGameState.isLoading && !startingGame
+                  ? "bg-white hover:bg-gray-200 text-black"
+                  : "bg-gray-600 text-white opacity-70"
+              } font-bold font-mono rounded-none border-2 border-white transition-all duration-200 relative overflow-hidden group text-sm sm:text-base`}
+              style={{ clipPath: 'polygon(0 0, 100% 0, 95% 100%, 5% 100%)' }}
+            >
+              <span className="relative z-10">{startGameState.isLoading || startingGame ? "STARTING GAME..." : "START GAME"}</span>
+              <span className="absolute inset-0 bg-gray-200 transform scale-x-0 origin-left transition-transform duration-200 group-hover:scale-x-100"></span>
+            </button>
+          )}
 
-        {playerError && (
-          <p className="mt-4 text-red-400">{playerError}</p>
-        )}
-        
-        {startGameState.error && (
-          <p className="mt-4 text-red-400">{startGameState.error}</p>
-        )}
-        
-        {gameState.txStatus.type === "error" && (
-          <p className="mt-4 text-red-400">{gameState.txStatus.message}</p>
-        )}
-        
-        {status === "connected" && address && (
-          <div className="mt-6 text-blue-300 text-sm">
-            Connected: {address.slice(0, 6)}...{address.slice(-4)}
-          </div>
-        )}
+          {playerError && (
+            <p className="mt-4 text-red-400 font-mono text-sm">{playerError}</p>
+          )}
+          
+          {startGameState.error && (
+            <p className="mt-4 text-red-400 font-mono text-sm">{startGameState.error}</p>
+          )}
+          
+          {gameState.txStatus.type === "error" && (
+            <p className="mt-4 text-red-400 font-mono text-sm">{gameState.txStatus.message}</p>
+          )}
+          
+          {status === "connected" && address && (
+            <div className="mt-6 text-gray-400 text-xs sm:text-sm font-mono tracking-wider">
+              CONNECTED: {address.slice(0, 6)}...{address.slice(-4)}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

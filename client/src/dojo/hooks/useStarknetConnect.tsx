@@ -1,6 +1,6 @@
 // hooks/useStarknetConnect.ts
 import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 export function useStarknetConnect() {
   const { connect, connectors } = useConnect();
@@ -8,6 +8,21 @@ export function useStarknetConnect() {
   const { status, address } = useAccount();
   const [hasTriedConnect, setHasTriedConnect] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const prevStatusRef = useRef(status);
+
+  // Only log when status changes
+  useEffect(() => {
+    if (prevStatusRef.current !== status) {
+      console.log("🎮 Starknet Connect Status:", {
+        status,
+        address: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null,
+        isConnecting,
+        hasTriedConnect,
+        availableConnectors: connectors.length
+      });
+      prevStatusRef.current = status;
+    }
+  }, [status, address, isConnecting, hasTriedConnect, connectors.length]);
 
   const handleConnect = useCallback(async () => {
     const connector = connectors[0]; // Cartridge connector
@@ -39,14 +54,6 @@ export function useStarknetConnect() {
       console.error("❌ Disconnection failed:", error);
     }
   }, [disconnect]);
-
-  console.log("🎮 Starknet Connect Status:", {
-    status,
-    address: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null,
-    isConnecting,
-    hasTriedConnect,
-    availableConnectors: connectors.length
-  });
 
   return { 
     status, 
